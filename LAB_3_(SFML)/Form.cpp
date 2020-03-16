@@ -28,33 +28,24 @@ void Buttom::Draw()
 		rect.setFillColor(col);
 		rect.setSize(sf::Vector2f(_width, _height));
 		rect.setPosition(_pos.GetX(), _pos.GetY());
+		rect.setOutlineThickness(4);
+		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
+
 		_window->draw(rect);
 	}
 	else
 	{
-		sf::RectangleShape rect;
-		sf::CircleShape circle;
+		RoundedRectangleShape rect;
 
+		rect.setCornersRadius(4);
+		rect.setCornerPointCount(5);
 		rect.setFillColor(col);
-		circle.setFillColor(col);
+		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setPosition(_pos.GetX(), _pos.GetY());
+		rect.setOutlineThickness(4);
+		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
 
-		rect.setSize(sf::Vector2f(_width - 10, _height));
-		rect.setPosition(_pos.GetX() + 5, _pos.GetY());
 		_window->draw(rect);
-
-		rect.setSize(sf::Vector2f(_width, _height - 10));
-		rect.setPosition(_pos.GetX(), _pos.GetY() + 5);
-		_window->draw(rect);
-
-		circle.setRadius(5.f);
-		circle.setPosition(sf::Vector2f(_pos.GetX(), _pos.GetY()));
-		_window->draw(circle);
-		circle.setPosition(sf::Vector2f(_pos.GetX() + _width - 10, _pos.GetY()));
-		_window->draw(circle);
-		circle.setPosition(sf::Vector2f(_pos.GetX() + _width - 10, _pos.GetY() + _height - 10));
-		_window->draw(circle);
-		circle.setPosition(sf::Vector2f(_pos.GetX(), _pos.GetY() + _height - 10));
-		_window->draw(circle);
 	}
 }
 

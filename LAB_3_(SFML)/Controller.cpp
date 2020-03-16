@@ -25,7 +25,8 @@ void Controller::InitApp()
 
     SetInterface(ptr_window, inter);
 
-    Triangle tr(ptr_window);
+    Rectangle tr(ptr_window, { 200, 200 }, 100, 100, sf::Color(10, 100, 200));
+    tr.SetScale(2, 1);
 
     while (window.isOpen())
     {
@@ -85,7 +86,7 @@ void Controller::InitApp()
 void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
 {
     Panel temp(window, Position(SC_WIDTH/4 * 3 + 4, 4), SC_WIDTH/4 - 8, SC_HEIGHT - 8, sf::Color(155, 155, 155));
-    Buttom but1(window, Position(SC_WIDTH / 4 * 3 + 10, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive);
+    Buttom but1(window, Position(SC_WIDTH / 4 * 3 + 10, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive, true);
     Buttom but2(window, Position(SC_WIDTH / 4 * 3 + 50, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive);
     Buttom but3(window, Position(SC_WIDTH / 4 * 3 + 90, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive);
 

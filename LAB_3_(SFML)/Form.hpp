@@ -4,6 +4,7 @@
 #define FORM_H
 
 #include "Settings.hpp"
+#include "RoundedRectangleShape.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        Form
