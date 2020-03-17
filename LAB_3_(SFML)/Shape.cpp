@@ -1,5 +1,18 @@
 #include "Shape.hpp"
 
+//----------------------------------------------------------------------------------------------------
+//                                        Circle
+//----------------------------------------------------------------------------------------------------
+
+void Circle::Draw()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------
+//                                        Rectangle
+//----------------------------------------------------------------------------------------------------
+
 std::vector<Position> Rectangle::GetPoints()
 {
 
@@ -14,12 +27,12 @@ void Rectangle::Draw()
 	rect.setFillColor(_color);
 	rect.setSize(sf::Vector2f(_width, _height));
 	rect.setOrigin(_width / 2, _height / 2);
-	rect.setPosition(_pos.GetX(), _pos.GetY());
+	rect.setPosition(_pos._x, _pos._y);
 	rect.rotate(_angle);
 
 	sf::Vector2f scale = rect.getScale();
 
-	rect.scale(scale.x * _scale.GetX(), scale.y * _scale.GetY());
+	rect.scale(scale.x * _scale._x, scale.y * _scale._y);
 
 	/*std::vector<Position> points = GetPoints();
 
@@ -39,6 +52,10 @@ void Rectangle::Draw()
 	_window->draw(rect);
 }
 
+//----------------------------------------------------------------------------------------------------
+//                                        Triangle
+//----------------------------------------------------------------------------------------------------
+
 std::vector<Position> Triangle::GetPoints()
 {
 	return std::vector<Position>();
@@ -53,9 +70,4 @@ void Triangle::Draw()
 	triangle.rotate(_angle);
 
 	_window->draw(triangle);
-}
-
-void Circle::Draw()
-{
-
 }

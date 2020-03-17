@@ -4,7 +4,7 @@
 //                                        Buttom
 //----------------------------------------------------------------------------------------------------
 
-void Buttom::Draw()
+void Button::Draw()
 {
 	sf::Color col = _color;
 
@@ -27,7 +27,7 @@ void Buttom::Draw()
 
 		rect.setFillColor(col);
 		rect.setSize(sf::Vector2f(_width, _height));
-		rect.setPosition(_pos.GetX(), _pos.GetY());
+		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
 		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
 
@@ -41,7 +41,7 @@ void Buttom::Draw()
 		rect.setCornerPointCount(5);
 		rect.setFillColor(col);
 		rect.setSize(sf::Vector2f(_width, _height));
-		rect.setPosition(_pos.GetX(), _pos.GetY());
+		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
 		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
 
@@ -55,8 +55,8 @@ void Buttom::Draw()
 
 bool Panel::OnPanel(Form& form)
 {
-	if (form.GetPosition().GetX() >= this->GetPosition().GetX() && form.GetPosition().GetY() >= this->GetPosition().GetY() &&
-		form.GetPosition().GetX() + form.GetWidth() <= this->GetPosition().GetX() + this->GetWidth() && form.GetPosition().GetY() + form.GetHeight() <= this->GetPosition().GetY() + this->GetHeight())
+	if (form.GetPosition()._x >= this->GetPosition()._x && form.GetPosition()._y >= this->GetPosition()._y &&
+		form.GetPosition()._x + form.GetWidth() <= this->GetPosition()._x + this->GetWidth() && form.GetPosition()._y + form.GetHeight() <= this->GetPosition()._y + this->GetHeight())
 	{
 		return true;
 	}
@@ -96,7 +96,7 @@ void Panel::Draw()
 
 	rect.setSize(sf::Vector2f(_width, _height));
 
-	rect.setPosition(_pos.GetX(), _pos.GetY());
+	rect.setPosition(_pos._x, _pos._y);
 
 	rect.setFillColor(_color);
 	rect.setOutlineColor(sf::Color(((_color.r - 15) % 255), ((_color.g - 15) % 255), ((_color.b - 15) % 255)));
@@ -110,38 +110,42 @@ void Panel::Draw()
 	}
 }
 
+//----------------------------------------------------------------------------------------------------
+//                                        Form
+//----------------------------------------------------------------------------------------------------
+
 bool operator==(Form& a, Form& b)
 {
-	if(a._pos.GetX() >= b._pos.GetX() && a._pos.GetY() >= b._pos.GetY() && a._pos.GetX() <= b._pos.GetX() + b._width && a._pos.GetY() <= b._pos.GetY() + b._height)
+	if(a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._width && a._pos._y <= b._pos._y + b._height)
 	{ 
 		return true;
 	}
-	else if (a._pos.GetX() + a._width >= b._pos.GetX() && a._pos.GetY() + a._height >= b._pos.GetY() && a._pos.GetX() + a._width <= b._pos.GetX() + b._width && a._pos.GetY() + a._height <= b._pos.GetY() + b._height)
+	else if (a._pos._x + a._width >= b._pos._x && a._pos._y + a._height >= b._pos._y && a._pos._x + a._width <= b._pos._x + b._width && a._pos._y + a._height <= b._pos._y + b._height)
 	{
 		return true;
 	}
-	else if (a._pos.GetX() + a._width >= b._pos.GetX() && a._pos.GetY() >= b._pos.GetY() && a._pos.GetX() + a._width <= b._pos.GetX() + b._width && a._pos.GetY() <= b._pos.GetY() + b._height)
+	else if (a._pos._x + a._width >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._width <= b._pos._x + b._width && a._pos._y <= b._pos._y + b._height)
 	{
 		return true;
 	}
-	else if (a._pos.GetX() >= b._pos.GetX() && a._pos.GetY() + a._height >= b._pos.GetY() && a._pos.GetX() <= b._pos.GetX() + b._width && a._pos.GetY() + a._height <= b._pos.GetY() + b._height)
+	else if (a._pos._x >= b._pos._x && a._pos._y + a._height >= b._pos._y && a._pos._x <= b._pos._x + b._width && a._pos._y + a._height <= b._pos._y + b._height)
 	{
 		return true;
 	}
 
-	if (b._pos.GetX() >= a._pos.GetX() && b._pos.GetY() >= a._pos.GetY() && b._pos.GetX() <= a._pos.GetX() + a._width && b._pos.GetY() <= a._pos.GetY() + a._height)
+	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._width && b._pos._y <= a._pos._y + a._height)
 	{
 		return true;
 	}
-	else if (b._pos.GetX() + b._width >= a._pos.GetX() && b._pos.GetY() + b._height >= a._pos.GetY() && b._pos.GetX() + b._width <= a._pos.GetX() + a._width && b._pos.GetY() + b._height <= a._pos.GetY() + a._height)
+	else if (b._pos._x + b._width >= a._pos._x && b._pos._y + b._height >= a._pos._y && b._pos._x + b._width <= a._pos._x + a._width && b._pos._y + b._height <= a._pos._y + a._height)
 	{
 		return true;
 	}
-	else if (b._pos.GetX() + b._width >= a._pos.GetX() && b._pos.GetY() >= a._pos.GetY() && b._pos.GetX() + b._width <= a._pos.GetX() + a._width && b._pos.GetY() <= a._pos.GetY() + a._height)
+	else if (b._pos._x + b._width >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._width <= a._pos._x + a._width && b._pos._y <= a._pos._y + a._height)
 	{
 		return true;
 	}
-	else if (b._pos.GetX() >= a._pos.GetX() && b._pos.GetY() + b._height >= a._pos.GetY() && b._pos.GetX() <= a._pos.GetX() + a._width && b._pos.GetY() + b._height <= a._pos.GetY() + a._height)
+	else if (b._pos._x >= a._pos._x && b._pos._y + b._height >= a._pos._y && b._pos._x <= a._pos._x + a._width && b._pos._y + b._height <= a._pos._y + a._height)
 	{
 		return true;
 	}
@@ -151,7 +155,7 @@ bool operator==(Form& a, Form& b)
 
 bool operator==(Form& a, Position& b)
 {
-	if (b.GetX() >= a._pos.GetX() && b.GetY() >= a._pos.GetY() && b.GetX() <= a._pos.GetX() + a.GetWidth() && b.GetY() <= a._pos.GetY() + a.GetHeight())
+	if (b._x >= a._pos._x && b._y >= a._pos._y && b._x <= a._pos._x + a.GetWidth() && b._y <= a._pos._y + a.GetHeight())
 	{
 		return true;
 	}

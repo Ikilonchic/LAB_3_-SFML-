@@ -3,9 +3,7 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include "Position.hpp"
-#include <SFML/Graphics.hpp>
-#include <vector>
+#include "Settings.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        Shape
@@ -27,7 +25,7 @@ protected:
 public:
 	Shape() { _pos = { 0, 0 }, _angle = 0, _color = sf::Color(), _scale = { 1, 1 }, _window = nullptr; }
 	Shape(sf::RenderWindow* window, Position pos = { 0, 0 }, const sf::Color color = sf::Color(), const float angle = 0, const Position scale = { 1, 1 }) { _pos = pos, _angle = angle, _color = color, _scale = scale, _window = window; }
-	Shape(sf::RenderWindow* window, const float x = 0, const float y = 0, const sf::Color color = sf::Color(), const float angle = 0, const float scale_x = 1, const float scale_y = 1) { _pos.SetX(x), _pos.SetY(y), _angle = angle, _color = color, _scale = Position(scale_x, scale_y), _window = window; }
+	Shape(sf::RenderWindow* window, const float x = 0, const float y = 0, const sf::Color color = sf::Color(), const float angle = 0, const float scale_x = 1, const float scale_y = 1) { _pos._x = x, _pos._y = y, _angle = angle, _color = color, _scale = Position(scale_x, scale_y), _window = window; }
 
 	virtual ~Shape() { _window = nullptr; }
 
@@ -37,14 +35,14 @@ public:
 	virtual sf::Color GetColor() const { return _color; }
 	virtual sf::RenderWindow* GetWindow() const { return _window; }
 
-	virtual void SetPosition(Position& pos) { _pos.SetX(pos.GetX()); _pos.SetY(pos.GetY()); }
+	virtual void SetPosition(Position& pos) { _pos._x = pos._x; _pos._y = pos._y; }
 	virtual void SetAngle(float angle) { _angle = angle; }
 	virtual void SetScale(float scale_x, float scale_y) { _scale = Position(scale_x, scale_y); }
 	virtual void SetColor(sf::Color color) { _color = color; }
 	virtual void SetWindow(sf::RenderWindow* window) { _window = window; }
 
 	virtual void Draw() = 0;
-	virtual void Move(const float x, const float y) { _pos.SetX(_pos.GetX() + x), _pos.SetY(_pos.GetY() + y); };
+	virtual void Move(const float x, const float y) { _pos._x += x, _pos._y += y; };
 	virtual void Rotate(const int angle) { _angle = (int)(_angle + angle) % 360; }
 };
 
@@ -82,7 +80,7 @@ protected:
 	float _width, _height;
 	static const int _amount = 4;
 
-	std::vector<Position> GetPoints();
+	std::vector<Position> GetPoints() override;
 
 public:
 	Rectangle() : Shape(), _width{ 0 }, _height{ 0 } {}

@@ -95,24 +95,24 @@ void Interface::DrawFocus(Form* focus)
 
 	if (focus != nullptr && _focus != nullptr)
 	{
-		dynamic_cast<Buttom*>(_focus)->SetState(State::Inactive);
+		dynamic_cast<Button*>(_focus)->SetState(State::Inactive);
 		_focus->Draw();
 
 		_focus = focus;
 		
-		dynamic_cast<Buttom*>(_focus)->SetState(State::Focused);
+		dynamic_cast<Button*>(_focus)->SetState(State::Focused);
 		_focus->Draw();
 	}
 	else if (focus != nullptr && _focus == nullptr)
 	{
 		_focus = focus;
 
-		dynamic_cast<Buttom*>(_focus)->SetState(State::Focused);
+		dynamic_cast<Button*>(_focus)->SetState(State::Focused);
 		_focus->Draw();
 	}
 	else if (focus == nullptr && _focus != nullptr)
 	{
-		dynamic_cast<Buttom*>(_focus)->SetState(State::Inactive);
+		dynamic_cast<Button*>(_focus)->SetState(State::Inactive);
 		_focus->Draw();
 
 		_focus = focus;
@@ -121,6 +121,8 @@ void Interface::DrawFocus(Form* focus)
 
 void Interface::Draw()
 {
+	_window->draw(_background);
+
 	for (auto a : _form)
 	{
 		a->Draw();

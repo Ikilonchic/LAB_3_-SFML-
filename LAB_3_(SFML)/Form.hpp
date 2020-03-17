@@ -45,7 +45,7 @@ public:
 	virtual State GetState() { return _state; }
 	virtual sf::RenderWindow* GetWindow() { return _window; }
 
-	virtual void SetPosition(Position& pos) { _pos.SetX(pos.GetX()); _pos.SetY(pos.GetY()); }
+	virtual void SetPosition(Position& pos) { _pos._x = pos._x; _pos._y = pos._y; }
 	virtual void SetWidth(float width) { _width = width; }
 	virtual void SetHeight(float height) { _height = height; }
 	virtual void SetRounding(bool rounding) { _rounding = rounding; }
@@ -64,20 +64,46 @@ public:
 //                                        Buttom
 //----------------------------------------------------------------------------------------------------
 
-class Buttom final: public Form
+enum Token
+{
+	None,
+	MoveLeft,
+	MoveRight,
+	MoveUp,
+	MoveDown,
+	RotateLeft,
+	RotateRight,
+	ReadFromFile,
+	SaveToFile,
+	FigureSelection
+};
+
+class Button final: public Form
 {
 	friend class Panel;
 
 private:
+	Token _action;
 
+	union
+	{
+		sf::Text _info;
+		sf::Sprite _image;
+	};
 
 public:
-	Buttom() : Form() {}
-	Buttom(sf::RenderWindow* window, Position pos = { 0, 0 }, float width = 0, float height = 0, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, pos, width, height, color, state, rounding) {}
-	Buttom(const Buttom& but) : Form(but._window, but._pos, but._width, but._height, but._color, but._state, but._rounding) {}
+	Button() : Form(), _action{ Token::None } {}
+	Button(sf::RenderWindow* window, Token token = Token::None, Position pos = { 0, 0 }, float width = 0, float height = 0, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, pos, width, height, color, state, rounding), _action{ token } {}
+	Button(const Button& but) : Form(but._window, but._pos, but._width, but._height, but._color, but._state, but._rounding), _action{ but._action } {}
 
-	virtual void Draw();
-	virtual Form* Clone() { return new Buttom(*this); }
+	~Button() {}
+
+	Token GetToken() { return _action; }
+
+	void SetToken(Token token) { _action = token; }
+
+	virtual void Draw() override;
+	virtual Form* Clone() override { return new Button(*this); }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -100,8 +126,8 @@ public:
 	bool CheckOverlay(Form& form);
 	void AddForm(Form& form);
 
-	virtual void Draw();
-	virtual Form* Clone() { return new Panel(*this); }
+	virtual void Draw() override;
+	virtual Form* Clone() override { return new Panel(*this); }
 };
 
 #endif

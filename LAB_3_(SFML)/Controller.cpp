@@ -12,7 +12,7 @@ void Controller::InitApp()
 
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
 
-    sf::RenderWindow window(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW);
+    sf::RenderWindow window(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW, settings);
     sf::RenderWindow* ptr_window = &window;
 
     sf::Event event;
@@ -85,15 +85,23 @@ void Controller::InitApp()
 
 void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
 {
+    sf::RectangleShape background;
+
+    background.setSize(sf::Vector2f(SC_WIDTH, SC_HEIGHT));
+    background.setPosition(0, 0);
+    background.setFillColor(sf::Color(130, 130, 130));
+
     Panel temp(window, Position(SC_WIDTH/4 * 3 + 4, 4), SC_WIDTH/4 - 8, SC_HEIGHT - 8, sf::Color(155, 155, 155));
-    Buttom but1(window, Position(SC_WIDTH / 4 * 3 + 10, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive, true);
-    Buttom but2(window, Position(SC_WIDTH / 4 * 3 + 50, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive);
-    Buttom but3(window, Position(SC_WIDTH / 4 * 3 + 90, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive);
+    Button but1(window, Token::ReadFromFile, Position(SC_WIDTH / 4 * 3 + 10, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive, true);
+    Button but2(window, Token::SaveToFile, Position(SC_WIDTH / 4 * 3 + 50, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive, true);
+    Button but3(window, Token::None, Position(SC_WIDTH / 4 * 3 + 90, 10), 30, 30, sf::Color(100, 100, 100), State::Inactive, true);
 
     temp.AddForm(but1);
     temp.AddForm(but2);
     temp.AddForm(but3);
 
+    inter.SetWindow(window);
+    inter.SetBackground(background);
     inter.AddPanel(temp);
 }
 
