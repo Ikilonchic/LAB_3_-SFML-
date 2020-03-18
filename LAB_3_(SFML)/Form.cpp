@@ -10,15 +10,15 @@ void Button::Draw()
 
 	if (_state == State::Focused)
 	{
-		col.r += 30;
-		col.g += 30;
-		col.b += 30;
+		col.r = abs((col.r + 30) % 256);
+		col.g = abs((col.g + 30) % 256);
+		col.b = abs((col.b + 30) % 256);
 	}
 	else if (_state == State::Active)
 	{
-		col.r -= 30;
-		col.g -= 30;
-		col.b -= 30;
+		col.r = abs((col.r - 30) % 256);
+		col.g = abs((col.g - 30) % 256);
+		col.b = abs((col.b - 30) % 256);
 	}
 
 	if (!_rounding)
@@ -29,7 +29,7 @@ void Button::Draw()
 		rect.setSize(sf::Vector2f(_width, _height));
 		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
-		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
+		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
 
 		_window->draw(rect);
 	}
@@ -43,7 +43,7 @@ void Button::Draw()
 		rect.setSize(sf::Vector2f(_width, _height));
 		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
-		rect.setOutlineColor(sf::Color(col.r + 30, col.g + 30, col.b + 30));
+		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
 
 		_window->draw(rect);
 	}
@@ -76,7 +76,7 @@ bool Panel::CheckOverlay(Form& form)
 	return true;
 }
 
-void Panel::AddForm(Form& form)
+void Panel::Add(Form& form)
 {
 	if(this->CheckOverlay(form) && this->OnPanel(form))
 	{ 
@@ -92,17 +92,34 @@ void Panel::AddForm(Form& form)
 
 void Panel::Draw()
 {
-	sf::RectangleShape rect;
+	if (!_rounding)
+	{
+		sf::RectangleShape rect;
 
-	rect.setSize(sf::Vector2f(_width, _height));
+		rect.setSize(sf::Vector2f(_width, _height));
 
-	rect.setPosition(_pos._x, _pos._y);
+		rect.setPosition(_pos._x, _pos._y);
 
-	rect.setFillColor(_color);
-	rect.setOutlineColor(sf::Color(((_color.r - 15) % 255), ((_color.g - 15) % 255), ((_color.b - 15) % 255)));
-	rect.setOutlineThickness(4);
+		rect.setFillColor(_color);
+		rect.setOutlineColor(sf::Color(abs((_color.r - 30) % 256), abs((_color.g - 30) % 256), abs((_color.b - 30) % 256)));
+		rect.setOutlineThickness(4);
 
-	_window->draw(rect);
+		_window->draw(rect);
+	}
+	else
+	{
+		RoundedRectangleShape rect;
+
+		rect.setCornersRadius(4);
+		rect.setCornerPointCount(5);
+		rect.setFillColor(_color);
+		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setPosition(_pos._x, _pos._y);
+		rect.setOutlineThickness(4);
+		rect.setOutlineColor(sf::Color(abs((_color.r - 30) % 256), abs((_color.g - 30) % 256), abs((_color.b - 30) % 256)));
+
+		_window->draw(rect);
+	}
 
 	for (auto a : _elem)
 	{

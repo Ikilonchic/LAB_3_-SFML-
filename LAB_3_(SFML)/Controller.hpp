@@ -7,6 +7,13 @@
 #include "Shape.hpp"
 
 //----------------------------------------------------------------------------------------------------
+//                                        Shapes
+//----------------------------------------------------------------------------------------------------
+
+static int INDEX = 0;
+static std::vector<Shape*> FIGURES;
+
+//----------------------------------------------------------------------------------------------------
 //                                        Controller
 //----------------------------------------------------------------------------------------------------
 
@@ -18,6 +25,13 @@ public:
 
 private:
 	static void SetInterface(sf::RenderWindow* window, Interface& inter);
+
+	static void Action(Form* action);
+
+	static std::string OpenFileDialog();
+	static Shape* OpenFiguresDialog();
+	static sf::Color OpenColorDialog();
+	static Position OpenScaleDialog();
 };
 
 #endif

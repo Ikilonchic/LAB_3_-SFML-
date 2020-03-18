@@ -99,7 +99,7 @@ void Interface::DrawFocus(Form* focus)
 		_focus->Draw();
 
 		_focus = focus;
-		
+
 		dynamic_cast<Button*>(_focus)->SetState(State::Focused);
 		_focus->Draw();
 	}

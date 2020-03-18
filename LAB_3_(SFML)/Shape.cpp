@@ -66,6 +66,7 @@ void Triangle::Draw()
 	sf::CircleShape triangle(80, 3);
 
 	triangle.setFillColor(sf::Color(133, 56, 134));
+	triangle.setOrigin(80, 80);
 	triangle.setPosition(400, 400);
 	triangle.rotate(_angle);
 

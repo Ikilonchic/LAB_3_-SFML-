@@ -22,6 +22,9 @@ public:
 
 	virtual ~Interface() { _window = nullptr, _focus = nullptr; }
 
+	virtual sf::RenderWindow* GetWindow() { return _window; }
+	virtual Form* GetFocus() { return _focus; }
+
 	virtual void SetWindow(sf::RenderWindow* window) { _window = window; }
 	virtual void SetBackground(sf::RectangleShape& background) { _background = background; }
 

@@ -34,6 +34,7 @@ protected:
 public:
 	Form() { _pos = { 0, 0 }, _rounding = false, _width = 0, _height = 0, _color = sf::Color(), _state = State::Inactive, _window = nullptr; }
 	Form(sf::RenderWindow* window, Position pos = { 0, 0 }, float width = 0, float height = 0, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) { _pos = pos, _rounding = rounding, _width = width, _height = height, _color = color, _state = state, _window = window; }
+	Form(sf::RenderWindow* window, Position pos = { 0, 0 }, sf::Vector2f size = { 0, 0 }, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) { _pos = pos, _rounding = rounding, _width = size.x, _height = size.y, _color = color, _state = state, _window = window; }
 	Form(sf::RenderWindow* window, float x = 0, float y = 0, float width = 0, float height = 0, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) { _pos = {x, y}, _rounding = rounding, _color = color, _width = width, _height = height, _state = state, _window = window; }
 
 	virtual ~Form() { _window = nullptr; }
@@ -67,15 +68,13 @@ public:
 enum Token
 {
 	None,
-	MoveLeft,
-	MoveRight,
-	MoveUp,
-	MoveDown,
-	RotateLeft,
-	RotateRight,
-	ReadFromFile,
-	SaveToFile,
-	FigureSelection
+	Left, Right, Up, Down,
+	RotateLeft, RotateRight,
+	Trail,
+	ReadFromFile, SaveToFile,
+	Add, Delete,
+	Next, Prev,
+	SelectColor, SelectScale, Hide_Show
 };
 
 class Button final: public Form
@@ -85,16 +84,14 @@ class Button final: public Form
 private:
 	Token _action;
 
-	union
-	{
-		sf::Text _info;
-		sf::Sprite _image;
-	};
+	sf::Sprite _info;
+	
 
 public:
-	Button() : Form(), _action{ Token::None } {}
-	Button(sf::RenderWindow* window, Token token = Token::None, Position pos = { 0, 0 }, float width = 0, float height = 0, sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, pos, width, height, color, state, rounding), _action{ token } {}
-	Button(const Button& but) : Form(but._window, but._pos, but._width, but._height, but._color, but._state, but._rounding), _action{ but._action } {}
+	Button() : Form(), _action{ Token::None }, _info{ sf::Sprite() } {}
+	Button(sf::RenderWindow* window, Token token = Token::None, Position pos = { 0, 0 }, float width = 0, float height = 0, sf::Color color = sf::Color(), sf::Sprite info = sf::Sprite(), State state = State::Inactive, bool rounding = false) : Form(window, pos, width, height, color, state, rounding), _action{ token }, _info{ info } {}
+	Button(sf::RenderWindow* window, Token token = Token::None, Position pos = { 0, 0 }, sf::Vector2f size = { 0, 0 }, sf::Color color = sf::Color(), sf::Sprite info = sf::Sprite(), State state = State::Inactive, bool rounding = false) : Form(window, pos, size, color, state, rounding), _action{ token }, _info{ info } {}
+	Button(const Button& but) : Form(but._window, but._pos, but._width, but._height, but._color, but._state, but._rounding), _action{ but._action }, _info{ but._info } {}
 
 	~Button() {}
 
@@ -124,7 +121,7 @@ public:
 
 	bool OnPanel(Form& form);
 	bool CheckOverlay(Form& form);
-	void AddForm(Form& form);
+	void Add(Form& form);
 
 	virtual void Draw() override;
 	virtual Form* Clone() override { return new Panel(*this); }
