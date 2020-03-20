@@ -26,7 +26,7 @@ void Button::Draw()
 		sf::RectangleShape rect;
 
 		rect.setFillColor(col);
-		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
 		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
 		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
@@ -40,7 +40,7 @@ void Button::Draw()
 		rect.setCornersRadius(4);
 		rect.setCornerPointCount(5);
 		rect.setFillColor(col);
-		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
 		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
 		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
@@ -96,7 +96,7 @@ void Panel::Draw()
 	{
 		sf::RectangleShape rect;
 
-		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
 
 		rect.setPosition(_pos._x, _pos._y);
 
@@ -113,7 +113,7 @@ void Panel::Draw()
 		rect.setCornersRadius(4);
 		rect.setCornerPointCount(5);
 		rect.setFillColor(_color);
-		rect.setSize(sf::Vector2f(_width, _height));
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
 		rect.setPosition(_pos._x, _pos._y);
 		rect.setOutlineThickness(4);
 		rect.setOutlineColor(sf::Color(abs((_color.r - 30) % 256), abs((_color.g - 30) % 256), abs((_color.b - 30) % 256)));
@@ -133,36 +133,36 @@ void Panel::Draw()
 
 bool operator==(Form& a, Form& b)
 {
-	if(a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._width && a._pos._y <= b._pos._y + b._height)
+	if(a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
 	{ 
 		return true;
 	}
-	else if (a._pos._x + a._width >= b._pos._x && a._pos._y + a._height >= b._pos._y && a._pos._x + a._width <= b._pos._x + b._width && a._pos._y + a._height <= b._pos._y + b._height)
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
 	{
 		return true;
 	}
-	else if (a._pos._x + a._width >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._width <= b._pos._x + b._width && a._pos._y <= b._pos._y + b._height)
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
 	{
 		return true;
 	}
-	else if (a._pos._x >= b._pos._x && a._pos._y + a._height >= b._pos._y && a._pos._x <= b._pos._x + b._width && a._pos._y + a._height <= b._pos._y + b._height)
+	else if (a._pos._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
 	{
 		return true;
 	}
 
-	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._width && b._pos._y <= a._pos._y + a._height)
+	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
 	{
 		return true;
 	}
-	else if (b._pos._x + b._width >= a._pos._x && b._pos._y + b._height >= a._pos._y && b._pos._x + b._width <= a._pos._x + a._width && b._pos._y + b._height <= a._pos._y + a._height)
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
 	{
 		return true;
 	}
-	else if (b._pos._x + b._width >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._width <= a._pos._x + a._width && b._pos._y <= a._pos._y + a._height)
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
 	{
 		return true;
 	}
-	else if (b._pos._x >= a._pos._x && b._pos._y + b._height >= a._pos._y && b._pos._x <= a._pos._x + a._width && b._pos._y + b._height <= a._pos._y + a._height)
+	else if (b._pos._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
 	{
 		return true;
 	}

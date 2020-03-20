@@ -9,11 +9,12 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
 #include <iostream>
 #include <chrono>
 #include <thread>
+//#include <Windows.h>
 #include "Position.hpp"
-#include <Windows.h>
 
 //----------------------------------------------------------------------------------------------------
 //                                        SCREEN
@@ -24,6 +25,8 @@
 
 #define MSG_WIDTH SC_WIDTH/2
 #define MSG_HEIGHT SC_HEIGHT/2
+
+#define DIFFERENCE float(SC_WIDTH) / 1280.0
 
 #define FULLSC sf::Style::Fullscreen
 #define WINDOW sf::Style::Default
@@ -36,9 +39,14 @@
 #define BACKGROUND_COLOR sf::Color(130, 130, 130)
 #define PANEL_COLOR sf::Color(190, 190, 190)
 #define BUTTOM_COLOR sf::Color(200, 200, 200)
+#define BLACK sf::Color(0, 0, 0)
+#define WHITE sf::Color(255, 255, 255)
 
-#define SMALL_BUT sf::Vector2f(45, 45)
-#define STANDARD_BUT sf::Vector2f(120, 45)
-#define BIG_BUT sf::Vector2f(260, 45)
+#define SMALL_BUT Position(45 * DIFFERENCE, 45 * DIFFERENCE)
+#define STANDARD_BUT Position(120 * DIFFERENCE, 45 * DIFFERENCE)
+#define BIG_BUT Position(260 * DIFFERENCE, 45 * DIFFERENCE)
 
+#define SMALL_OUTLINE 2 * DIFFERENCE
+#define STANDARD_OUTLINE 2 * DIFFERENCE
+#define BIG_OUTLINE 6 * DIFFERENCE
 #endif

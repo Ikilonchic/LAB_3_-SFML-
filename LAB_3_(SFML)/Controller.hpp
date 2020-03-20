@@ -3,7 +3,6 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "Interface.hpp"
 #include "Shape.hpp"
 
 //----------------------------------------------------------------------------------------------------
@@ -26,7 +25,8 @@ public:
 private:
 	static void SetInterface(sf::RenderWindow* window, Interface& inter);
 
-	static void Action(Form* action);
+	static void LongAction(sf::RenderWindow* window, Form* action);
+	static void ShortAction(sf::RenderWindow* window, Form* action);
 
 	static std::string OpenFileDialog();
 	static Shape* OpenFiguresDialog();
