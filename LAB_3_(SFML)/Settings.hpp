@@ -7,12 +7,13 @@
 //                                        INCLUDE
 //----------------------------------------------------------------------------------------------------
 
+#define _USE_MATH_DEFINES
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <chrono>
-#include <thread>
+#include <cmath>
 //#include <Windows.h>
 #include "Position.hpp"
 

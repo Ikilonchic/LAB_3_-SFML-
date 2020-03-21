@@ -40,18 +40,32 @@ void Circle::Update()
 	_shape = circ;
 }
 
-sf::Vector2f Circle::GetPoint(const int index)
+Position Circle::GetPoint(const int index)
 {
-	if (index < 8)
+	if (index < 16)
 	{
-		sf::Vector2f pos = _shape.getPoint(index * (_shape.getPointCount() / 8));
-		pos.x += _pos._x;
-		pos.y += _pos._y;
+		sf::Vector2f vec = _shape.getPoint(index * _shape.getPointCount() / 16);
+
+		Position pos(vec.x, vec.y);
+
+		pos._x -= _radius;
+		pos._y -= _radius;
+
+		pos._x *= _scale._x;
+		pos._y *= _scale._y;
+
+		float xa = pos._x, ya = pos._y;
+
+		pos._x = xa * std::cos(_angle * M_PI / 180.0) - ya * std::sin(_angle * M_PI / 180.0);
+		pos._y = xa * std::sin(_angle * M_PI / 180.0) + ya * std::cos(_angle * M_PI / 180.0);
+
+		pos._x += _pos._x;
+		pos._y += _pos._y;
 
 		return pos;
 	}
 
-	return sf::Vector2f();
+	return Position();
 }
 
 void Circle::Draw()
@@ -61,13 +75,9 @@ void Circle::Draw()
 
 bool Circle::OnArea(const float x, const float y)
 {
-	for (auto i = 0; i < 8; i += 2)
+	for (auto i = 0; i < 16; i += 2)
 	{
-		if (GetPoint(i).x > 0 && GetPoint(i).y > 0 && GetPoint(i).x < x && GetPoint(i).y < y)
-		{
-			continue;
-		}
-		else
+		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
 		{
 			return false;
 		}
@@ -117,24 +127,34 @@ void Rectangle::Update()
 	_shape = rect;
 }
 
-sf::Vector2f Rectangle::GetPoint(const int index)
+Position Rectangle::GetPoint(const int index)
 {
 	size_t count = _shape.getPointCount();
 
 	if (index < count)
 	{
-		sf::Vector2f pos = _shape.getPoint(index);
+		sf::Vector2f vec = _shape.getPoint(index);
 
-		pos.x -= _width / 2;
-		pos.y -= _height / 2;
+		Position pos(vec.x, vec.y);
 
-		pos.x += _pos._x;
-		pos.y += _pos._y;
+		pos._x -= _width / 2;
+		pos._y -= _height / 2;
+
+		pos._x *= _scale._x;
+		pos._y *= _scale._y;
+
+		float xa = pos._x, ya = pos._y;
+
+		pos._x = xa * std::cos(_angle * M_PI / 180.0) - ya * std::sin(_angle * M_PI / 180.0);
+		pos._y = xa * std::sin(_angle * M_PI / 180.0) + ya * std::cos(_angle * M_PI / 180.0);
+
+		pos._x += _pos._x;
+		pos._y += _pos._y;
 
 		return pos;
 	}
 
-	return sf::Vector2f();
+	return Position();
 }
 
 void Rectangle::Draw()
@@ -146,11 +166,7 @@ bool Rectangle::OnArea(const float x, const float y)
 {
 	for (auto i = 0; i < _shape.getPointCount(); i++)
 	{
-		if (GetPoint(i).x > 0 && GetPoint(i).y > 0 && GetPoint(i).x < x && GetPoint(i).y < y)
-		{
-			continue;
-		}
-		else
+		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
 		{
 			return false;
 		}
@@ -199,37 +215,34 @@ void Triangle::Update()
 	_shape = triangle;
 }
 
-sf::Vector2f Triangle::GetPoint(const int index)
+Position Triangle::GetPoint(const int index)
 {
 	size_t count = _shape.getPointCount();
 
 	if (index < count)
 	{
-		sf::Vector2f pos = _shape.getPoint(index);
+		sf::Vector2f vec = _shape.getPoint(index);
 
-		pos.x -= _radius;
-		pos.y -= _radius;
+		Position pos(vec.x, vec.y);
 
-		pos.x *= _scale._x;
-		pos.y *= _scale._y;
+		pos._x -= _radius;
+		pos._y -= _radius;
 
-		float xa = -pos.x, ya = -pos.y;
+		pos._x *= _scale._x;
+		pos._y *= _scale._y;
 
-		pos.x = xa * cos(_angle) - (ya * sin(_angle));
-		pos.y = (xa * sin(_angle)) + ya * cos(_angle);
+		float xa = pos._x, ya = pos._y;
 
-		pos.x = -pos.x;
-		pos.y = -pos.y;
+		pos._x = xa * std::cos(_angle * M_PI / 180.0) - ya * std::sin(_angle * M_PI / 180.0);
+		pos._y = xa * std::sin(_angle * M_PI / 180.0) + ya * std::cos(_angle * M_PI / 180.0);
 
-		pos.x += _pos._x;
-		pos.y += _pos._y;
-
-		std::cout << _angle << std::endl;
+		pos._x += _pos._x;
+		pos._y += _pos._y;
 
 		return pos;
 	}
 
-	return sf::Vector2f();
+	return Position();
 }
 
 void Triangle::Draw()
@@ -241,15 +254,62 @@ bool Triangle::OnArea(const float x, const float y)
 {
 	for (auto i = 0; i < _shape.getPointCount(); i++)
 	{
-		if (GetPoint(i).x > 0 && GetPoint(i).y > 0 && GetPoint(i).x < x && GetPoint(i).y < y)
-		{
-			continue;
-		}
-		else
+		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
 		{
 			return false;
 		}
 	}
 
 	return true;
+}
+
+
+//----------------------------------------------------------------------------------------------------
+//                                        Check crossing
+//----------------------------------------------------------------------------------------------------
+
+bool AreCrossing(const Position A, const Position B, const Position C, const Position D)
+{
+	double Ax1, Ay1, Bx2, By2, Cx3, Cy3, Dx4, Dy4;
+	double Ua, Ub, numerator_a, numerator_b, denominator;
+
+	denominator = (D._y - C._y) * (A._x - B._x) - (D._x - C._x) * (A._y - B._y);
+
+	if (denominator == 0) 
+	{
+		if ((A._x * B._y - B._x * A._y) * (D._x - C._x) - (C._x * D._y - D._x * C._y) * (B._x - A._x) == 0 && (A._x * B._y - B._x * A._y) * (D._y - C._y) - (C._x * D._y - D._x * C._y) * (B._y - A._y) == 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else 
+	{
+		numerator_a = (D._x - B._x) * (D._y - C._y) - (D._x - C._x) * (D._y - B._y);
+		numerator_b = (A._x - B._x) * (D._y - B._y) - (D._x - B._x) * (A._y - B._y);
+
+		Ua = numerator_a / denominator;
+		Ub = numerator_b / denominator;
+
+		return Ua >= 0 && Ua <= 1 && Ub >= 0 && Ub <= 1 ? true : false;
+	}
+}
+
+bool Shape::CheckÑollision(Shape* first, Shape* second)
+{
+	for (size_t i = 0; i < first->GetPointCount(); i++)
+	{
+		for (size_t j = 0; j < second->GetPointCount(); j++)
+		{
+			if (AreCrossing(first->GetPoint(i), first->GetPoint((i + 1) % first->GetPointCount()), second->GetPoint(j), second->GetPoint((j + 1) % second->GetPointCount())))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

@@ -28,8 +28,9 @@ void Controller::InitApp()
 
     SetInterface(ptr_window, inter);
 
-    FIGURES.push_back(new Triangle(ptr_window, 100, 100, 80, sf::Color(12, 45, 155), 20));
     FIGURES.push_back(new Rectangle(ptr_window, 200, 200, 80, 80, sf::Color(244, 78, 90)));
+    FIGURES.push_back(new Triangle(ptr_window, 100, 100, 80, sf::Color(12, 45, 155), 20));
+    FIGURES.push_back(new Circle(ptr_window, 400, 400, 100, sf::Color(34, 155, 78)));
 
     while (window.isOpen())
     {
@@ -106,6 +107,10 @@ void Controller::InitApp()
     }
 }
 
+//----------------------------------------------------------------------------------------------------
+//                                        Set interface
+//----------------------------------------------------------------------------------------------------
+
 void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
 {
     sf::RectangleShape background;
@@ -159,6 +164,10 @@ void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
     inter.AddPanel(temp);
 }
 
+//----------------------------------------------------------------------------------------------------
+//                                        Long action
+//----------------------------------------------------------------------------------------------------
+
 void Controller::LongAction(sf::RenderWindow* window, Form* action)
 {
     switch (dynamic_cast<Button*>(action)->GetToken())
@@ -168,7 +177,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Move(0, -1);
-            if(!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, 1);
+            if(!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(0, 1);
         }
 
         break;
@@ -178,7 +187,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Move(-1, 0);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(1, 0);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(1, 0);
         }
 
         break;
@@ -188,7 +197,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Move(1, 0);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(-1, 0);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(-1, 0);
         }
 
         break;
@@ -198,7 +207,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Move(0, 1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, -1);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(0, -1);
         }
 
         break;
@@ -208,7 +217,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Rotate(-1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Rotate(1);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Rotate(1);
         }
 
         break;
@@ -218,7 +227,7 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         if (FIGURES.size() != 0)
         {
             FIGURES[INDEX]->Rotate(1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Rotate(-1);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Rotate(-1);
         }
 
         break;
@@ -227,6 +236,10 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
         break;
     }
 }
+
+//----------------------------------------------------------------------------------------------------
+//                                        Short action
+//----------------------------------------------------------------------------------------------------
 
 void Controller::ShortAction(sf::RenderWindow* window, Form* action)
 {
@@ -798,6 +811,22 @@ Position Controller::OpenScaleDialog()
     }
 
     return Position();
+}
+
+bool Controller::CheckCollision(int INDEX)
+{
+    for (auto a : FIGURES)
+    {
+        if (a != FIGURES[INDEX])
+        {
+            if (Shape::Check—ollision(FIGURES[INDEX], a))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Controller::Instruction(sf::RenderWindow* window)

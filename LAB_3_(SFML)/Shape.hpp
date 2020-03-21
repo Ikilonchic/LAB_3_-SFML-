@@ -5,6 +5,8 @@
 
 #include "Interface.hpp"
 
+bool AreCrossing(const Position A, const Position B, const Position C, const Position D);
+
 //----------------------------------------------------------------------------------------------------
 //                                        Shape
 //----------------------------------------------------------------------------------------------------
@@ -23,7 +25,7 @@ protected:
 	sf::RenderWindow* _window;
 
 	virtual void Update() = 0;
-	virtual sf::Vector2f GetPoint(const int index) = 0;
+	virtual Position GetPoint(const int index) = 0;
 
 public:
 	Shape() { _pos = { 0, 0 }, _angle = 0, _color = sf::Color(), _scale = { 1, 1 }, _window = nullptr; }
@@ -32,6 +34,7 @@ public:
 
 	virtual ~Shape() { _window = nullptr; }
 
+	virtual size_t GetPointCount() const = 0;
 	virtual Position GetPosition() const { return _pos; }
 	virtual float GetAngle() const { return _angle; }
 	virtual Position GetScale() const { return _scale; }
@@ -53,6 +56,8 @@ public:
 	virtual void Rotate(const int angle) { _angle = (int)(_angle + angle + 360) % 360; Update(); }
 
 	virtual bool OnArea(const float xa, const float ya) = 0;
+
+	static bool Check—ollision(Shape* first, Shape* second);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -66,7 +71,7 @@ protected:
 	sf::CircleShape _shape;
 
 	virtual void Update() override;
-	virtual sf::Vector2f GetPoint(const int index) override;
+	virtual Position GetPoint(const int index) override;
 
 public:
 	Circle() : Shape(), _radius{ 0 } { Update(); }
@@ -75,6 +80,7 @@ public:
 
 	virtual ~Circle() {}
 
+	virtual size_t GetPointCount() const override { return 16; }
 	float GetRadius() const { return _radius; }
 
 	void SetSize(const Position size) override { _radius = size._x; Update(); }
@@ -95,7 +101,7 @@ protected:
 	sf::RectangleShape _shape;
 
 	virtual void Update() override;
-	virtual sf::Vector2f GetPoint(const int index) override;
+	virtual Position GetPoint(const int index) override;
 
 public:
 	Rectangle() : Shape(), _width{ 0 }, _height{ 0 } { Update(); }
@@ -103,6 +109,8 @@ public:
 	Rectangle(sf::RenderWindow* window, const float x = 0, const float y = 0, const float width = 0, const float height = 0, const sf::Color color = sf::Color(), const float angle = 0) : Shape(window, x, y, color, angle), _width{ width }, _height{ height } { Update(); }
 
 	virtual ~Rectangle() {}
+
+	virtual size_t GetPointCount() const override { return _shape.getPointCount(); }
 
 	void SetSize(const Position size) override { _width = size._x, _height = size._y; Update(); }
 
@@ -122,7 +130,7 @@ protected:
 	sf::CircleShape _shape;
 
 	virtual void Update() override;
-	virtual sf::Vector2f GetPoint(const int index) override;
+	virtual Position GetPoint(const int index) override;
 
 public:
 	Triangle() : Shape(), _radius{ 0 } { Update(); }
@@ -130,6 +138,8 @@ public:
 	Triangle(sf::RenderWindow* window, const float x = 0, const float y = 0, const float radius = 0, const sf::Color color = sf::Color(), const float angle = 0) : Shape(window, x, y, color, angle), _radius{ radius } { Update(); }
 
 	~Triangle() {}
+
+	virtual size_t GetPointCount() const override { return _shape.getPointCount(); }
 
 	void SetSize(const Position size) override { _radius = size._x; Update(); }
 

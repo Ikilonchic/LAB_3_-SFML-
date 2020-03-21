@@ -32,6 +32,8 @@ private:
 	static Shape* OpenFiguresDialog();
 	static sf::Color OpenColorDialog();
 	static Position OpenScaleDialog();
+
+	static bool CheckCollision(int INDEX);
 };
 
 #endif
