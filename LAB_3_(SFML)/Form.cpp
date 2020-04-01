@@ -1,4 +1,57 @@
-#include "Form.hpp"
+﻿#include "Form.hpp"
+
+//----------------------------------------------------------------------------------------------------
+//                                        Form
+//----------------------------------------------------------------------------------------------------
+
+bool operator==(Form& a, Form& b)
+{
+	if (a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
+	{
+		return true;
+	}
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
+	{
+		return true;
+	}
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
+	{
+		return true;
+	}
+	else if (a._pos._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
+	{
+		return true;
+	}
+
+	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
+	{
+		return true;
+	}
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
+	{
+		return true;
+	}
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
+	{
+		return true;
+	}
+	else if (b._pos._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool operator==(Form& a, Position& b)
+{
+	if (b._x >= a._pos._x && b._y >= a._pos._y && b._x <= a._pos._x + a.GetWidth() && b._y <= a._pos._y + a.GetHeight())
+	{
+		return true;
+	}
+
+	return false;
+}
 
 //----------------------------------------------------------------------------------------------------
 //                                        Buttom
@@ -47,6 +100,93 @@ void Button::Draw()
 
 		_window->draw(rect);
 	}
+
+	sf::Font font;
+	font.loadFromFile("arial.ttf");
+	sf::Text info("", font, 20);
+
+	switch (_action)
+	{
+	case None:
+		break;
+	case OK:
+		info.setString("OK");
+		break;
+	case Cancel:
+		info.setString("Cancel");
+		break;
+	case Left:
+		info.setString(L'←');
+		break;
+	case Right:
+		info.setString(L'→');
+		break;
+	case Up:
+		info.setString(L'↑');
+		break;
+	case Down:
+		info.setString(L'↓');
+		break;
+	case Trail:
+		info.setString(L'○');
+		break;
+	case ReadFromFile:
+		info.setString("Read from file");
+		break;
+	case SaveToFile:
+		info.setString("Save to file");
+		break;
+	case Add:
+		info.setString("Add");
+		break;
+	case Delete:
+		info.setString("Delete");
+		break;
+	case Next:
+		info.setString("Next");
+		break;
+	case Prev:
+		info.setString("Prev");
+		break;
+	case SelectColor:
+		info.setString("Color");
+		break;
+	case SelectScale:
+		info.setString("Scale");
+		break;
+	case Hide_Show:
+		info.setString("Hide/Show");
+		break;
+	case circ:
+		info.setString("Circle");
+		break;
+	case rect:
+		info.setString("Rectangle");
+		break;
+	case triang:
+		info.setString("Triangle");
+		break;
+	case unit:
+		info.setString("Unit shape");
+		break;
+	default:
+		break;
+	}
+
+	sf::FloatRect area = info.getLocalBounds();
+	info.setOrigin(area.width / 2, area.height / 2 + info.getLineSpacing() + 5);
+	info.setPosition(sf::Vector2f(_pos._x + _size._x / 2, _pos._y + _size._y / 2));
+
+	_window->draw(info);
+}
+
+//----------------------------------------------------------------------------------------------------
+//                                        TextBox
+//----------------------------------------------------------------------------------------------------
+
+void TextBox::Draw()
+{
+
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -125,57 +265,4 @@ void Panel::Draw()
 	{
 		a->Draw();
 	}
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Form
-//----------------------------------------------------------------------------------------------------
-
-bool operator==(Form& a, Form& b)
-{
-	if(a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
-	{ 
-		return true;
-	}
-	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
-	{
-		return true;
-	}
-	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
-	{
-		return true;
-	}
-	else if (a._pos._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
-	{
-		return true;
-	}
-
-	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
-	{
-		return true;
-	}
-	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
-	{
-		return true;
-	}
-	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
-	{
-		return true;
-	}
-	else if (b._pos._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool operator==(Form& a, Position& b)
-{
-	if (b._x >= a._pos._x && b._y >= a._pos._y && b._x <= a._pos._x + a.GetWidth() && b._y <= a._pos._y + a.GetHeight())
-	{
-		return true;
-	}
-
-	return false;
 }

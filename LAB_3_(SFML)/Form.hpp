@@ -4,7 +4,6 @@
 #define FORM_H
 
 #include "Settings.hpp"
-#include "RoundedRectangleShape.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        Form
@@ -74,7 +73,11 @@ enum Token
 	ReadFromFile, SaveToFile,
 	Add, Delete,
 	Next, Prev,
-	SelectColor, SelectScale, Hide_Show
+	SelectColor, SelectScale, Hide_Show,
+
+	//////////////////////////////
+
+	circ, rect, triang, unit
 };
 
 class Button final: public Form
@@ -84,6 +87,7 @@ class Button final: public Form
 private:
 	Token _action;
 
+	char* _info;
 	sf::Sprite _image;
 
 public:
@@ -101,6 +105,24 @@ public:
 
 	virtual void Draw() override;
 	virtual Form* Clone() override { return new Button(*this); }
+};
+
+//----------------------------------------------------------------------------------------------------
+//                                        TextBox
+//----------------------------------------------------------------------------------------------------
+
+class TextBox final : public Form
+{
+public:
+	TextBox() : Form() {}
+	TextBox(sf::RenderWindow* window, float const x = 0, float const y = 0, const float width = 0, const float height = 0, const sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, x, y, width, height, color, state, rounding) {}
+	TextBox(sf::RenderWindow* window, const Position pos = { 0, 0 }, const Position size = { 0, 0 }, const sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, pos, size, color, state, rounding) {}
+	TextBox(const TextBox& box) : Form(box._window, box._pos, box._size, box._color, box._state, box._rounding) {}
+
+	~TextBox() {}
+
+	virtual void Draw() override;
+	virtual Form* Clone() override { return new TextBox(*this); }
 };
 
 //----------------------------------------------------------------------------------------------------

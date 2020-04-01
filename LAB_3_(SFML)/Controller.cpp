@@ -28,9 +28,8 @@ void Controller::InitApp()
 
     SetInterface(ptr_window, inter);
 
-    FIGURES.push_back(new Rectangle(ptr_window, 200, 200, 80, 80, sf::Color(244, 78, 90)));
-    FIGURES.push_back(new Triangle(ptr_window, 100, 100, 80, sf::Color(12, 45, 155), 20));
-    FIGURES.push_back(new Circle(ptr_window, 400, 400, 100, sf::Color(34, 155, 78)));
+    FIGURES.push_back(new Rectangle(ptr_window, 100, 100, 50, 50, sf::Color(155, 155, 200)));
+    FIGURES.push_back(new Rectangle(ptr_window, 300, 300, 50, 50, sf::Color(50, 50, 50)));
 
     while (window.isOpen())
     {
@@ -97,10 +96,7 @@ void Controller::InitApp()
             LongAction(ptr_window, focus);
         }
 
-        for (auto figure : FIGURES)
-        {
-            figure->Draw();
-        }
+        DrawFigures();
 
         window.display();
         window.clear();
@@ -122,7 +118,7 @@ void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
     Panel temp(window, SC_WIDTH / 4 * 3 + 4, 4, SC_WIDTH / 4 - 8, SC_HEIGHT - 8, PANEL_COLOR, State::Inactive);
 
     Button but1(window, Token::ReadFromFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 25 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::SaveToFile, {SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 89 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but2(window, Token::SaveToFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 89 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
 
     Button but3(window, Token::Up, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 208 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
     Button but4(window, Token::Left, { SC_WIDTH / 4 * 3 + 70 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
@@ -164,76 +160,118 @@ void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
     inter.AddPanel(temp);
 }
 
+void Controller::DrawFigures()
+{
+    if (COLLIDING_FIGURES.size() == 0)
+    {
+        for (auto figure : FIGURES)
+        {
+            figure->Draw();
+        }
+
+        if (FIGURES.size() != 0)
+        {
+            FIGURES[INDEX]->Draw();
+        }
+    }
+    else
+    {
+        for (auto figure : FIGURES)
+        {
+            bool flag = true;
+
+            for (auto colliding_figure : COLLIDING_FIGURES)
+            {
+                if (figure == colliding_figure)
+                {
+                    flag = false; break;
+                }
+            }
+
+            if (figure != FIGURES[INDEX] && flag)
+            {
+                figure->Draw();
+            }
+        }
+
+        sf::Color temp;
+
+        for (auto figure : COLLIDING_FIGURES)
+        {
+            temp = figure->GetColor();
+            figure->SetColor(collision_color);
+
+            figure->Draw();
+
+            figure->SetColor(temp);
+        }
+
+        temp = FIGURES[INDEX]->GetColor();
+        FIGURES[INDEX]->SetColor(collision_color);
+
+        FIGURES[INDEX]->Draw();
+
+        FIGURES[INDEX]->SetColor(temp);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------
 //                                        Long action
 //----------------------------------------------------------------------------------------------------
 
 void Controller::LongAction(sf::RenderWindow* window, Form* action)
 {
-    switch (dynamic_cast<Button*>(action)->GetToken())
+    if (FIGURES.size() != 0)
     {
-    case Token::Up:
-    {
-        if (FIGURES.size() != 0)
+        switch (dynamic_cast<Button*>(action)->GetToken())
+        {
+        case Token::Up:
         {
             FIGURES[INDEX]->Move(0, -1);
-            if(!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(0, 1);
-        }
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, 1);
 
-        break;
-    }
-    case Token::Left:
-    {
-        if (FIGURES.size() != 0)
+            break;
+        }
+        case Token::Left:
         {
             FIGURES[INDEX]->Move(-1, 0);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(1, 0);
-        }
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(1, 0);
 
-        break;
-    }
-    case Token::Right:
-    {
-        if (FIGURES.size() != 0)
+            break;
+        }
+        case Token::Right:
         {
             FIGURES[INDEX]->Move(1, 0);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(-1, 0);
-        }
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(-1, 0);
 
-        break;
-    }
-    case Token::Down:
-    {
-        if (FIGURES.size() != 0)
+            break;
+        }
+        case Token::Down:
         {
             FIGURES[INDEX]->Move(0, 1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Move(0, -1);
-        }
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, -1);
 
-        break;
-    }
-    case Token::RotateLeft:
-    {
-        if (FIGURES.size() != 0)
+            break;
+        }
+        case Token::RotateLeft:
         {
             FIGURES[INDEX]->Rotate(-1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Rotate(1);
-        }
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Rotate(1);
 
-        break;
-    }
-    case Token::RotateRight:
-    {
-        if (FIGURES.size() != 0)
+            break;
+        }
+        case Token::RotateRight:
         {
             FIGURES[INDEX]->Rotate(1);
-            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) || CheckCollision(INDEX)) FIGURES[INDEX]->Rotate(-1);
+            if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Rotate(-1);
+
+            break;
+        }
+        default:
+            break;
         }
 
-        break;
-    }
-    default:
-        break;
+        CheckCollision(INDEX);
     }
 }
 
@@ -288,6 +326,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
             }
         }
 
+        if(FIGURES.size() != 0) CheckCollision(INDEX);
+
         break;
     }
     case Token::Add:
@@ -301,6 +341,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
             FIGURES.push_back(shape);
             INDEX = FIGURES.size() - 1;
         }
+
+        CheckCollision(INDEX);
 
         break;
     }
@@ -319,6 +361,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
             {
                 FIGURES[INDEX]->SetOutlineThickness(true);
             }
+
+            CheckCollision(INDEX);
         }
 
         break;
@@ -338,6 +382,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
             {
                 FIGURES[INDEX]->SetOutlineThickness(true);
             }
+
+            CheckCollision(INDEX);
         }
 
         break;
@@ -356,6 +402,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
                 FIGURES[INDEX]->SetVisible(true);
                 FIGURES[INDEX]->SetOutlineThickness(false);
             }
+
+            CheckCollision(INDEX);
         }
 
         break;
@@ -366,6 +414,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
         sf::Color color = OpenColorDialog();
         window->setVisible(true);
 
+        CheckCollision(INDEX);
+
         break;
     }
     case Token::SelectScale:
@@ -373,6 +423,8 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
         window->setVisible(false);
         Position scale = OpenScaleDialog();
         window->setVisible(true);
+
+        CheckCollision(INDEX);
 
         break;
     }
@@ -510,11 +562,17 @@ Shape* Controller::OpenFiguresDialog()
     Form* focus = nullptr;
 
     Panel temp(ptr_window, 0, 0, MSG_HEIGHT, MSG_WIDTH, PANEL_COLOR, State::Inactive);
-    Button but1(ptr_window, Token::OK, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(ptr_window, Token::Cancel, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2 , MSG_WIDTH * 2 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(ptr_window, Token::circ, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but2(ptr_window, Token::rect, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 2 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but3(ptr_window, Token::triang, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 3/ 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but4(ptr_window, Token::unit, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 4 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but5(ptr_window, Token::Cancel, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2 , MSG_WIDTH * 5 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
+    temp.Add(but3);
+    temp.Add(but4);
+    temp.Add(but5);
 
     inter.SetWindow(ptr_window);
     inter.AddPanel(temp);
@@ -813,20 +871,45 @@ Position Controller::OpenScaleDialog()
     return Position();
 }
 
-bool Controller::CheckCollision(int INDEX)
+void Controller::CheckCollision(int INDEX)
 {
-    for (auto a : FIGURES)
+    if (FIGURES[INDEX]->GetVisible())
     {
-        if (a != FIGURES[INDEX])
+        COLLIDING_FIGURES = std::vector<Shape*>();
+
+        int r = 0, g = 0, b = 0;
+
+        bool flag = false;
+
+        for (auto a : FIGURES)
         {
-            if (Shape::CheckÑollision(FIGURES[INDEX], a))
+            if (a != FIGURES[INDEX] && Shape::CheckÑollision(FIGURES[INDEX], a) && a->GetVisible())
             {
-                return true;
+                COLLIDING_FIGURES.push_back(a);
+
+                r += a->GetColor().r;
+                g += a->GetColor().g;
+                b += a->GetColor().b;
+
+                flag = true;
             }
         }
-    }
 
-    return false;
+        if (flag)
+        {
+            r += FIGURES[INDEX]->GetColor().r;
+            g += FIGURES[INDEX]->GetColor().g;
+            b += FIGURES[INDEX]->GetColor().b;
+
+            r /= COLLIDING_FIGURES.size() + 1;
+            g /= COLLIDING_FIGURES.size() + 1;
+            b /= COLLIDING_FIGURES.size() + 1;
+
+            collision_color.r = r;
+            collision_color.g = g;
+            collision_color.b = b;
+        }
+    }
 }
 
 void Controller::Instruction(sf::RenderWindow* window)

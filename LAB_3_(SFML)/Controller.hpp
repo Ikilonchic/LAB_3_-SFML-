@@ -12,6 +12,9 @@
 static int INDEX = 0;
 static std::vector<Shape*> FIGURES;
 
+static std::vector<Shape*> COLLIDING_FIGURES;
+static sf::Color collision_color;
+
 //----------------------------------------------------------------------------------------------------
 //                                        Controller
 //----------------------------------------------------------------------------------------------------
@@ -24,6 +27,7 @@ public:
 
 private:
 	static void SetInterface(sf::RenderWindow* window, Interface& inter);
+	static void DrawFigures();
 
 	static void LongAction(sf::RenderWindow* window, Form* action);
 	static void ShortAction(sf::RenderWindow* window, Form* action);
@@ -33,7 +37,7 @@ private:
 	static sf::Color OpenColorDialog();
 	static Position OpenScaleDialog();
 
-	static bool CheckCollision(int INDEX);
+	static void CheckCollision(int INDEX);
 };
 
 #endif

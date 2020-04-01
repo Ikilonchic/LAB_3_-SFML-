@@ -263,19 +263,80 @@ bool Triangle::OnArea(const float x, const float y)
 	return true;
 }
 
+//----------------------------------------------------------------------------------------------------
+//                                        Star
+//----------------------------------------------------------------------------------------------------
+
+void Star::Update()
+{
+	sf::CircleShape triangle(_radius, 5);
+
+	if (_visible)
+	{
+		_color.a = 255;
+	}
+	else
+	{
+		_color.a = 0;
+	}
+
+	triangle.setOutlineColor(BLACK);
+
+	if (_outline)
+	{
+		triangle.setOutlineThickness(SMALL_OUTLINE);
+	}
+	else
+	{
+		triangle.setOutlineThickness(0);
+	}
+
+	triangle.setFillColor(_color);
+	triangle.setPosition(_pos._x, _pos._y);
+	triangle.setOrigin(_radius - 1, _radius - 1);
+	triangle.rotate(_angle);
+
+	sf::Vector2f scale = triangle.getScale();
+
+	triangle.scale(scale.x * _scale._x, scale.y * _scale._y);
+
+	_shape = triangle;
+}
+
+Position Star::GetPoint(const int index)
+{
+	return Position();
+}
+
+void Star::Draw()
+{
+	_window->draw(_shape);
+}
+
+bool Star::OnArea(const float x, const float y)
+{
+	for (auto i = 0; i < _shape.getPointCount(); i++)
+	{
+		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 //----------------------------------------------------------------------------------------------------
-//                                        Check crossing
+//                                        Check collision
 //----------------------------------------------------------------------------------------------------
 
 bool AreCrossing(const Position A, const Position B, const Position C, const Position D)
 {
-	double Ax1, Ay1, Bx2, By2, Cx3, Cy3, Dx4, Dy4;
-	double Ua, Ub, numerator_a, numerator_b, denominator;
+	double denominator;
 
 	denominator = (D._y - C._y) * (A._x - B._x) - (D._x - C._x) * (A._y - B._y);
 
-	if (denominator == 0) 
+	if (denominator == 0)
 	{
 		if ((A._x * B._y - B._x * A._y) * (D._x - C._x) - (C._x * D._y - D._x * C._y) * (B._x - A._x) == 0 && (A._x * B._y - B._x * A._y) * (D._y - C._y) - (C._x * D._y - D._x * C._y) * (B._y - A._y) == 0)
 		{
@@ -286,13 +347,13 @@ bool AreCrossing(const Position A, const Position B, const Position C, const Pos
 			return false;
 		}
 	}
-	else 
+	else
 	{
-		numerator_a = (D._x - B._x) * (D._y - C._y) - (D._x - C._x) * (D._y - B._y);
-		numerator_b = (A._x - B._x) * (D._y - B._y) - (D._x - B._x) * (A._y - B._y);
+		double numerator_a = (D._x - B._x) * (D._y - C._y) - (D._x - C._x) * (D._y - B._y);
+		double numerator_b = (A._x - B._x) * (D._y - B._y) - (D._x - B._x) * (A._y - B._y);
 
-		Ua = numerator_a / denominator;
-		Ub = numerator_b / denominator;
+		double Ua = numerator_a / denominator;
+		double Ub = numerator_b / denominator;
 
 		return Ua >= 0 && Ua <= 1 && Ub >= 0 && Ub <= 1 ? true : false;
 	}
@@ -300,11 +361,60 @@ bool AreCrossing(const Position A, const Position B, const Position C, const Pos
 
 bool Shape::CheckÑollision(Shape* first, Shape* second)
 {
+	Position temp;
+
+	if (first->GetPosition()._x - second->GetPosition()._x < 0)
+	{
+		temp._x = -1000;
+	}
+	else if (first->GetPosition()._x - second->GetPosition()._x > 0)
+	{
+		temp._x = 1000;
+	}
+
+	if (first->GetPosition()._y - second->GetPosition()._y < 0)
+	{
+		temp._y = -1000;
+	}
+	else if (first->GetPosition()._y - second->GetPosition()._y > 0)
+	{
+		temp._y = 1000;
+	}
+
 	for (size_t i = 0; i < first->GetPointCount(); i++)
 	{
 		for (size_t j = 0; j < second->GetPointCount(); j++)
 		{
-			if (AreCrossing(first->GetPoint(i), first->GetPoint((i + 1) % first->GetPointCount()), second->GetPoint(j), second->GetPoint((j + 1) % second->GetPointCount())))
+			if (AreCrossing(temp, first->GetPoint(i), second->GetPoint(j), second->GetPoint((j + 1) % second->GetPointCount())))
+			{
+				return true;
+			}
+		}
+	}
+
+	if (second->GetPosition()._x - first->GetPosition()._x < 0)
+	{
+		temp._x = -1000;
+	}
+	else if (second->GetPosition()._x - first->GetPosition()._x > 0)
+	{
+		temp._x = 1000;
+	}
+
+	if (second->GetPosition()._y - first->GetPosition()._y < 0)
+	{
+		temp._y = -1000;
+	}
+	else if (second->GetPosition()._y - first->GetPosition()._y > 0)
+	{
+		temp._y = 1000;
+	}
+
+	for (size_t i = 0; i < second->GetPointCount(); i++)
+	{
+		for (size_t j = 0; j < first->GetPointCount(); j++)
+		{
+			if (AreCrossing(temp, second->GetPoint(i), first->GetPoint(j), first->GetPoint((j + 1) % first->GetPointCount())))
 			{
 				return true;
 			}
@@ -312,4 +422,41 @@ bool Shape::CheckÑollision(Shape* first, Shape* second)
 	}
 
 	return false;
+}
+
+//----------------------------------------------------------------------------------------------------
+//                                        UnitShape
+//----------------------------------------------------------------------------------------------------
+
+size_t UnitShape::GetPointCount() const
+{
+	size_t count = 0;
+
+	for (auto shape : _elem)
+	{
+		count += shape->GetPointCount();
+	}
+
+	return count;
+}
+
+void UnitShape::Draw()
+{
+	for (auto shape : _elem)
+	{
+		shape->Draw();
+	}
+}
+
+bool UnitShape::OnArea(const float x, const float y)
+{
+	for (auto shape : _elem)
+	{
+		if (!(shape->OnArea(x, y)))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

@@ -3,6 +3,10 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+//----------------------------------------------------------------------------------------------------
+//                                        Position
+//----------------------------------------------------------------------------------------------------
+
 class Position
 {
 public:
@@ -15,7 +19,6 @@ public:
 	virtual Position GetPosition() { return *this; }
 
 	virtual void SetPosition(const float xa, const float ya) { _x = xa, _y = ya; }
-
 };
 
 #endif

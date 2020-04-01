@@ -16,6 +16,7 @@
 #include <cmath>
 //#include <Windows.h>
 #include "Position.hpp"
+#include "RoundedRectangleShape.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        SCREEN
@@ -50,4 +51,5 @@
 #define SMALL_OUTLINE 2 * DIFFERENCE
 #define STANDARD_OUTLINE 2 * DIFFERENCE
 #define BIG_OUTLINE 6 * DIFFERENCE
+
 #endif

@@ -5,8 +5,6 @@
 
 #include "Interface.hpp"
 
-bool AreCrossing(const Position A, const Position B, const Position C, const Position D);
-
 //----------------------------------------------------------------------------------------------------
 //                                        Shape
 //----------------------------------------------------------------------------------------------------
@@ -110,7 +108,7 @@ public:
 
 	virtual ~Rectangle() {}
 
-	virtual size_t GetPointCount() const override { return _shape.getPointCount(); }
+	virtual size_t GetPointCount() const override { return 4; }
 
 	void SetSize(const Position size) override { _width = size._x, _height = size._y; Update(); }
 
@@ -123,7 +121,7 @@ public:
 //                                        Triangle
 //----------------------------------------------------------------------------------------------------
 
-class Triangle : public Shape
+class Triangle final: public Shape
 {
 protected:
 	float _radius;
@@ -139,11 +137,66 @@ public:
 
 	~Triangle() {}
 
-	virtual size_t GetPointCount() const override { return _shape.getPointCount(); }
+	virtual size_t GetPointCount() const override { return 3; }
 
 	void SetSize(const Position size) override { _radius = size._x; Update(); }
 
 	virtual void Draw() override;
+
+	virtual bool OnArea(const float x, const float y) override;
+};
+
+//----------------------------------------------------------------------------------------------------
+//                                        Star
+//----------------------------------------------------------------------------------------------------
+
+class Star final : public Shape
+{
+private:
+	float _radius;
+	sf::CircleShape _shape;
+
+	virtual void Update() override;
+	virtual Position GetPoint(const int index) override;
+
+public:
+	Star() : Shape(), _radius{ 0 } { Update(); }
+	Star(sf::RenderWindow* window, Position pos = { 0, 0 }, const float radius = 0, const sf::Color color = sf::Color(), const float angle = 0) : Shape(window, pos, color, angle), _radius{ radius } { Update(); }
+	Star(sf::RenderWindow* window, const float x = 0, const float y = 0, const float radius = 0, const sf::Color color = sf::Color(), const float angle = 0) : Shape(window, x, y, color, angle), _radius{ radius } { Update(); }
+
+	~Star() {}
+
+	virtual size_t GetPointCount() const override { return 5; }
+
+	void SetSize(const Position size) override { _radius = size._x; Update(); }
+
+	virtual void Draw() override;
+
+	virtual bool OnArea(const float x, const float y) override;
+};
+
+//----------------------------------------------------------------------------------------------------
+//                                        UnitShape
+//----------------------------------------------------------------------------------------------------
+
+class UnitShape final : public Shape
+{
+protected:
+	std::vector<Shape*> _elem;
+
+	virtual void Update() override {};
+	virtual Position GetPoint(const int index) override { return Position(); };
+
+public:
+	UnitShape() {}
+	UnitShape(sf::RenderWindow* window, std::vector<Shape*> shapes, Position pos = { 0, 0 }, const float angle = 0, const Position scale = { 1, 1 }) : Shape(window, pos, sf::Color(), angle, scale) { _elem = shapes; }
+
+	virtual size_t GetPointCount() const;
+	void SetSize(const Position size) override {}
+
+	virtual void Draw() override;
+	virtual void Move(const float x, const float y) override { _pos._x += x, _pos._y += y; for (auto shape : _elem) { shape->Move(x, y); } Update(); };
+	virtual void Rotate(const int angle) override { _angle = (int)(_angle + angle + 360) % 360; for (auto shape : _elem) { shape->Rotate(angle); } Update(); }
 
 	virtual bool OnArea(const float x, const float y) override;
 };
