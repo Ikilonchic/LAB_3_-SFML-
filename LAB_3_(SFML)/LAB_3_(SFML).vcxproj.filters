@@ -33,6 +33,9 @@
     <ClCompile Include="ShapeFactory.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Form.hpp">
@@ -56,7 +59,10 @@
     <ClInclude Include="RoundedRectangleShape.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="ShapeFactory.h">
+    <ClInclude Include="ShapeFactory.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

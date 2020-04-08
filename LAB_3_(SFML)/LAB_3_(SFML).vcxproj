@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Form.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -153,13 +154,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller.hpp" />
+    <ClInclude Include="Dialog.hpp" />
     <ClInclude Include="Form.hpp" />
     <ClInclude Include="Interface.hpp" />
     <ClInclude Include="Position.hpp" />
     <ClInclude Include="RoundedRectangleShape.hpp" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Shape.hpp" />
-    <ClInclude Include="ShapeFactory.h" />
+    <ClInclude Include="ShapeFactory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

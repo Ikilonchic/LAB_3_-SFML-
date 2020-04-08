@@ -3,7 +3,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "Shape.hpp"
+#include "Dialog.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        Shapes
@@ -23,19 +23,14 @@ class Controller
 {
 public:
 	static void InitApp();
-	static void Instruction(sf::RenderWindow* window);
+	static void Instruction(std::shared_ptr<sf::RenderWindow> window);
 
 private:
-	static void SetInterface(sf::RenderWindow* window, Interface& inter);
+	static void SetInterface(std::shared_ptr<sf::RenderWindow> window, Interface& inter);
 	static void DrawFigures();
 
-	static void LongAction(sf::RenderWindow* window, Form* action);
-	static void ShortAction(sf::RenderWindow* window, Form* action);
-
-	static std::string OpenFileDialog();
-	static Shape* OpenFiguresDialog();
-	static sf::Color OpenColorDialog();
-	static Position OpenScaleDialog();
+	static void LongAction(std::shared_ptr<sf::RenderWindow> window, Form* action);
+	static void ShortAction(std::shared_ptr<sf::RenderWindow> window, Form* action);
 
 	static void CheckCollision(int INDEX);
 };

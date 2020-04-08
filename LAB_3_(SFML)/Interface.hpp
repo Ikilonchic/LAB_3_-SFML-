@@ -12,7 +12,7 @@
 class Interface
 {
 private:
-	sf::RenderWindow* _window;
+	std::shared_ptr<sf::RenderWindow> _window;
 	sf::RectangleShape _background;
 	std::vector<Panel*> _form;
 	Form* _focus;
@@ -22,10 +22,10 @@ public:
 
 	virtual ~Interface() { _window = nullptr, _focus = nullptr; }
 
-	virtual sf::RenderWindow* GetWindow() { return _window; }
+	virtual std::shared_ptr<sf::RenderWindow> GetWindow() { return _window; }
 	virtual Form* GetFocus() { return _focus; }
 
-	virtual void SetWindow(sf::RenderWindow* window) { _window = window; }
+	virtual void SetWindow(std::shared_ptr<sf::RenderWindow> window) { _window = window; }
 	virtual void SetBackground(sf::RectangleShape& background) { _background = background; }
 
 	virtual void AddPanel(Panel& form);

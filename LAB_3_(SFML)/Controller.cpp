@@ -3,7 +3,7 @@
 #include "Controller.hpp"
 
 //----------------------------------------------------------------------------------------------------
-//                                        Controller
+//                                        Main window
 //----------------------------------------------------------------------------------------------------
 
 void Controller::InitApp()
@@ -13,10 +13,9 @@ void Controller::InitApp()
 
     //ShowWindow(GetConsoleWindow(), SW_SHOW);
 
-    sf::RenderWindow window(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW, settings);
-    window.setFramerateLimit(60);
-    sf::RenderWindow* ptr_window = &window;
-    
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW, settings);
+    window->setFramerateLimit(60);
+
     sf::Event event;
     bool mouse_pressed = false, mouse_pressed_on_button = false;
 
@@ -26,22 +25,23 @@ void Controller::InitApp()
 
     Form* focus = nullptr;
 
-    SetInterface(ptr_window, inter);
+    SetInterface(window, inter);
 
-    FIGURES.push_back(new Rectangle(ptr_window, 100, 100, 50, 50, sf::Color(155, 155, 200)));
-    FIGURES.push_back(new Rectangle(ptr_window, 300, 300, 50, 50, sf::Color(50, 50, 50)));
+    FIGURES.push_back(new Rectangle(window, 100, 100, 50, 50, sf::Color(155, 155, 200)));
+    FIGURES.push_back(new Rectangle(window, 300, 300, 50, 50, sf::Color(50, 50, 50)));
+    FIGURES.push_back(new Circle(window, 400, 300, 50, sf::Color(10, 10, 10)));
 
-    while (window.isOpen())
+    while (window->isOpen())
     {
         inter.Draw();
 
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             switch (event.type)
             {
             case sf::Event::MouseMoved:
             {
-                cursor = sf::Mouse::getPosition(*ptr_window);
+                cursor = sf::Mouse::getPosition(*window);
 
                 if (!mouse_pressed)
                 {
@@ -57,7 +57,7 @@ void Controller::InitApp()
                 {
                     focus->SetState(State::Active);
                     focus->Draw();
-                    ShortAction(ptr_window, focus);
+                    //ShortAction(window, focus);
                     mouse_pressed_on_button = true;
                 }
 
@@ -66,6 +66,11 @@ void Controller::InitApp()
             }
             case sf::Event::MouseButtonReleased:
             {
+                if (mouse_pressed_on_button)
+                {
+                    ShortAction(window, focus);
+                }
+
                 focus = inter.CheckFocused(cursor.x, cursor.y);
                 inter.DrawFocus(focus);
 
@@ -75,14 +80,14 @@ void Controller::InitApp()
             }
             case sf::Event::Closed:
             {
-                window.close();
+                window->close();
                 break;
             }
             case sf::Event::KeyPressed:
             {
                 if (event.key.code == sf::Keyboard::Escape)
                 {
-                    window.close();
+                    window->close();
                 }
                 break;
             }
@@ -93,13 +98,13 @@ void Controller::InitApp()
 
         if (mouse_pressed_on_button && focus != nullptr)
         {
-            LongAction(ptr_window, focus);
+            LongAction(window, focus);
         }
 
         DrawFigures();
 
-        window.display();
-        window.clear();
+        window->display();
+        window->clear();
     }
 }
 
@@ -107,7 +112,7 @@ void Controller::InitApp()
 //                                        Set interface
 //----------------------------------------------------------------------------------------------------
 
-void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
+void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interface& inter)
 {
     sf::RectangleShape background;
 
@@ -159,6 +164,10 @@ void Controller::SetInterface(sf::RenderWindow* window, Interface& inter)
     inter.SetBackground(background);
     inter.AddPanel(temp);
 }
+
+//----------------------------------------------------------------------------------------------------
+//                                        Draw figures
+//----------------------------------------------------------------------------------------------------
 
 void Controller::DrawFigures()
 {
@@ -219,7 +228,7 @@ void Controller::DrawFigures()
 //                                        Long action
 //----------------------------------------------------------------------------------------------------
 
-void Controller::LongAction(sf::RenderWindow* window, Form* action)
+void Controller::LongAction(std::shared_ptr<sf::RenderWindow> window, Form* action)
 {
     if (FIGURES.size() != 0)
     {
@@ -279,14 +288,14 @@ void Controller::LongAction(sf::RenderWindow* window, Form* action)
 //                                        Short action
 //----------------------------------------------------------------------------------------------------
 
-void Controller::ShortAction(sf::RenderWindow* window, Form* action)
+void Controller::ShortAction(std::shared_ptr<sf::RenderWindow> window, Form* action)
 {
     switch (dynamic_cast<Button*>(action)->GetToken())
     {
     case Token::ReadFromFile:
     {
         window->setVisible(false);
-        std::string file = OpenFileDialog();
+        std::string file = Dialog::OpenFileDialog();
         window->setVisible(true);
 
         break;
@@ -294,7 +303,7 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
     case Token::SaveToFile:
     {
         window->setVisible(false);
-        std::string file = OpenFileDialog();
+        std::string file = Dialog::OpenFileDialog();
         window->setVisible(true);
 
         break;
@@ -333,7 +342,7 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
     case Token::Add:
     {
         window->setVisible(false);
-        Shape* shape = OpenFiguresDialog();
+        Shape* shape = Dialog::OpenFiguresDialog();
         window->setVisible(true);
 
         if (shape != nullptr)
@@ -411,7 +420,7 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
     case Token::SelectColor:
     {
         window->setVisible(false);
-        sf::Color color = OpenColorDialog();
+        sf::Color color = Dialog::OpenColorDialog();
         window->setVisible(true);
 
         CheckCollision(INDEX);
@@ -421,7 +430,7 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
     case Token::SelectScale:
     {
         window->setVisible(false);
-        Position scale = OpenScaleDialog();
+        Position scale = Dialog::OpenScaleDialog();
         window->setVisible(true);
 
         CheckCollision(INDEX);
@@ -434,449 +443,15 @@ void Controller::ShortAction(sf::RenderWindow* window, Form* action)
 }
 
 //----------------------------------------------------------------------------------------------------
-//                                        File dialog
+//                                        Check collision
 //----------------------------------------------------------------------------------------------------
-
-std::string Controller::OpenFileDialog()
-{
-    std::string file_name;
-
-    sf::RenderWindow window(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "Выбор файла", WINDOW);
-    sf::RenderWindow* ptr_window = &window;
-
-    sf::Event event;
-    bool mouse_pressed = false;
-
-    Interface inter;
-
-    sf::Vector2i cursor;
-
-    Form* focus = nullptr;
-
-    Panel temp(ptr_window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(ptr_window, Token::OK, {MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(ptr_window, Token::Cancel, {MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-
-    temp.Add(but1);
-    temp.Add(but2);
-
-    inter.SetWindow(ptr_window);
-    inter.AddPanel(temp);
-
-    while (window.isOpen())
-    {
-        inter.Draw();
-
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::MouseMoved:
-            {
-                cursor = sf::Mouse::getPosition(*ptr_window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
-
-                if (!mouse_pressed)
-                {
-                    inter.DrawFocus(focus);
-                }
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            {
-                if (event.mouseButton.button == sf::Mouse::Left && focus != nullptr)
-                {
-                    focus->SetState(State::Active);
-                    focus->Draw();
-
-                    switch(dynamic_cast<Button*>(focus)->GetToken())
-                    {
-                    case Token::OK:
-                    {
-                        return file_name;
-                    }
-                    case Token::Cancel:
-                    {
-                        window.close();
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
-
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
-                inter.DrawFocus(focus);
-
-                mouse_pressed = false;
-                break;
-            }
-            case sf::Event::Closed:
-            {
-                window.close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    window.close();
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        window.display();
-        window.clear();
-    }
-
-    return std::string();
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Figures dialog
-//----------------------------------------------------------------------------------------------------
-
-Shape* Controller::OpenFiguresDialog()
-{
-    Shape* shape = nullptr;
-
-    sf::RenderWindow window(sf::VideoMode(MSG_HEIGHT, MSG_WIDTH), "Выбор фигуры", WINDOW);
-    sf::RenderWindow* ptr_window = &window;
-
-    sf::Event event;
-    bool mouse_pressed = false;
-
-    Interface inter;
-
-    sf::Vector2i cursor;
-
-    Form* focus = nullptr;
-
-    Panel temp(ptr_window, 0, 0, MSG_HEIGHT, MSG_WIDTH, PANEL_COLOR, State::Inactive);
-    Button but1(ptr_window, Token::circ, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(ptr_window, Token::rect, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 2 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but3(ptr_window, Token::triang, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 3/ 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but4(ptr_window, Token::unit, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 4 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but5(ptr_window, Token::Cancel, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2 , MSG_WIDTH * 5 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-
-    temp.Add(but1);
-    temp.Add(but2);
-    temp.Add(but3);
-    temp.Add(but4);
-    temp.Add(but5);
-
-    inter.SetWindow(ptr_window);
-    inter.AddPanel(temp);
-
-    while (window.isOpen())
-    {
-        inter.Draw();
-
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::MouseMoved:
-            {
-                cursor = sf::Mouse::getPosition(*ptr_window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
-
-                if (!mouse_pressed)
-                {
-                    inter.DrawFocus(focus);
-                }
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            {
-                if (event.mouseButton.button == sf::Mouse::Left && focus != nullptr)
-                {
-                    focus->SetState(State::Active);
-                    focus->Draw();
-
-                    switch (dynamic_cast<Button*>(focus)->GetToken())
-                    {
-                    case Token::OK:
-                    {
-                        return shape;
-                    }
-                    case Token::Cancel:
-                    {
-                        window.close();
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
-
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
-                inter.DrawFocus(focus);
-
-                mouse_pressed = false;
-                break;
-            }
-            case sf::Event::Closed:
-            {
-                window.close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    window.close();
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        window.display();
-        window.clear();
-    }
-
-    return nullptr;
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Color dialog
-//----------------------------------------------------------------------------------------------------
-
-sf::Color Controller::OpenColorDialog()
-{
-    sf::Color color;
-
-    sf::RenderWindow window(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "Выбор фигуры", WINDOW);
-    sf::RenderWindow* ptr_window = &window;
-
-    sf::Event event;
-    bool mouse_pressed = false;
-
-    Interface inter;
-
-    sf::Vector2i cursor;
-
-    Form* focus = nullptr;
-
-    Panel temp(ptr_window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(ptr_window, Token::OK, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(ptr_window, Token::Cancel, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-
-    temp.Add(but1);
-    temp.Add(but2);
-
-    inter.SetWindow(ptr_window);
-    inter.AddPanel(temp);
-
-    while (window.isOpen())
-    {
-        inter.Draw();
-
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::MouseMoved:
-            {
-                cursor = sf::Mouse::getPosition(*ptr_window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
-
-                if (!mouse_pressed)
-                {
-                    inter.DrawFocus(focus);
-                }
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            {
-                if (event.mouseButton.button == sf::Mouse::Left && focus != nullptr)
-                {
-                    focus->SetState(State::Active);
-                    focus->Draw();
-
-                    switch (dynamic_cast<Button*>(focus)->GetToken())
-                    {
-                    case Token::OK:
-                    {
-                        return color;
-                    }
-                    case Token::Cancel:
-                    {
-                        window.close();
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
-
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
-                inter.DrawFocus(focus);
-
-                mouse_pressed = false;
-                break;
-            }
-            case sf::Event::Closed:
-            {
-                window.close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    window.close();
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        window.display();
-        window.clear();
-    }
-
-    return sf::Color();
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Scale dialog
-//----------------------------------------------------------------------------------------------------
-
-Position Controller::OpenScaleDialog()
-{
-    Position pos;
-
-    sf::RenderWindow window(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "Выбор фигуры", WINDOW);
-    sf::RenderWindow* ptr_window = &window;
-
-    sf::Event event;
-    bool mouse_pressed = false;
-
-    Interface inter;
-
-    sf::Vector2i cursor;
-
-    Form* focus = nullptr;
-
-    Panel temp(ptr_window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(ptr_window, Token::OK, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(ptr_window, Token::Cancel, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-
-    temp.Add(but1);
-    temp.Add(but2);
-
-    inter.SetWindow(ptr_window);
-    inter.AddPanel(temp);
-
-    while (window.isOpen())
-    {
-        inter.Draw();
-
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::MouseMoved:
-            {
-                cursor = sf::Mouse::getPosition(*ptr_window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
-
-                if (!mouse_pressed)
-                {
-                    inter.DrawFocus(focus);
-                }
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            {
-                if (event.mouseButton.button == sf::Mouse::Left && focus != nullptr)
-                {
-                    focus->SetState(State::Active);
-                    focus->Draw();
-
-                    switch (dynamic_cast<Button*>(focus)->GetToken())
-                    {
-                    case Token::OK:
-                    {
-                        return pos;
-                    }
-                    case Token::Cancel:
-                    {
-                        window.close();
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
-
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
-                inter.DrawFocus(focus);
-
-                mouse_pressed = false;
-                break;
-            }
-            case sf::Event::Closed:
-            {
-                window.close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    window.close();
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        window.display();
-        window.clear();
-    }
-
-    return Position();
-}
 
 void Controller::CheckCollision(int INDEX)
 {
+    COLLIDING_FIGURES = std::vector<Shape*>();
+
     if (FIGURES[INDEX]->GetVisible())
     {
-        COLLIDING_FIGURES = std::vector<Shape*>();
-
         int r = 0, g = 0, b = 0;
 
         bool flag = false;
@@ -912,7 +487,11 @@ void Controller::CheckCollision(int INDEX)
     }
 }
 
-void Controller::Instruction(sf::RenderWindow* window)
+//----------------------------------------------------------------------------------------------------
+//                                        Instruction
+//----------------------------------------------------------------------------------------------------
+
+void Controller::Instruction(std::shared_ptr<sf::RenderWindow> window)
 {
 
 }
