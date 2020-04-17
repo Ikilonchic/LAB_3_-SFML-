@@ -57,7 +57,7 @@ void Controller::InitApp()
                 {
                     focus->SetState(State::Active);
                     focus->Draw();
-                    //ShortAction(window, focus);
+
                     mouse_pressed_on_button = true;
                 }
 
@@ -122,24 +122,24 @@ void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interfac
 
     Panel temp(window, SC_WIDTH / 4 * 3 + 4, 4, SC_WIDTH / 4 - 8, SC_HEIGHT - 8, PANEL_COLOR, State::Inactive);
 
-    Button but1(window, Token::ReadFromFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 25 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::SaveToFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 89 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(window, Token::ReadFromFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 25 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::SaveToFile, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 89 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
 
-    Button but3(window, Token::Up, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 208 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but4(window, Token::Left, { SC_WIDTH / 4 * 3 + 70 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but5(window, Token::Trail, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but6(window, Token::Right, { SC_WIDTH / 4 * 3 + 200 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but7(window, Token::Down, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 338 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but8(window, Token::RotateLeft, { SC_WIDTH / 4 * 3 + 75 * DIFFERENCE, 213 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but9(window, Token::RotateRight, Position(SC_WIDTH / 4 * 3 + 195 * DIFFERENCE, 213 * DIFFERENCE), SMALL_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but3(window, Token::Up, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 208 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but4(window, Token::Left, { SC_WIDTH / 4 * 3 + 70 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but5(window, Token::Trail, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but6(window, Token::Right, { SC_WIDTH / 4 * 3 + 200 * DIFFERENCE, 273 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but7(window, Token::Down, { SC_WIDTH / 4 * 3 + 135 * DIFFERENCE, 338 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but8(window, Token::RotateLeft, { SC_WIDTH / 4 * 3 + 75 * DIFFERENCE, 213 * DIFFERENCE }, SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but9(window, Token::RotateRight, Position(SC_WIDTH / 4 * 3 + 195 * DIFFERENCE, 213 * DIFFERENCE), SMALL_BUT, BUTTOM_COLOR, State::Inactive, true);
 
-    Button but10(window, Token::Delete, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 454 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but11(window, Token::Add, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 454 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but12(window, Token::Prev, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but13(window, Token::Next, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but14(window, Token::Hide_Show, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 584 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but15(window, Token::SelectColor, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but16(window, Token::SelectScale, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but10(window, Token::Delete, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 454 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but11(window, Token::Add, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 454 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but12(window, Token::Prev, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but13(window, Token::Next, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but14(window, Token::Hide_Show, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 584 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but15(window, Token::SelectColor, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but16(window, Token::SelectScale, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
@@ -236,28 +236,28 @@ void Controller::LongAction(std::shared_ptr<sf::RenderWindow> window, Form* acti
         {
         case Token::Up:
         {
-            FIGURES[INDEX]->Move(0, -1);
+            FIGURES[INDEX]->Move(0, -2);
             if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, 1);
 
             break;
         }
         case Token::Left:
         {
-            FIGURES[INDEX]->Move(-1, 0);
+            FIGURES[INDEX]->Move(-2, 0);
             if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(1, 0);
 
             break;
         }
         case Token::Right:
         {
-            FIGURES[INDEX]->Move(1, 0);
+            FIGURES[INDEX]->Move(2, 0);
             if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(-1, 0);
 
             break;
         }
         case Token::Down:
         {
-            FIGURES[INDEX]->Move(0, 1);
+            FIGURES[INDEX]->Move(0, 2);
             if (!FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) FIGURES[INDEX]->Move(0, -1);
 
             break;
@@ -296,6 +296,7 @@ void Controller::ShortAction(std::shared_ptr<sf::RenderWindow> window, Form* act
     {
         window->setVisible(false);
         std::string file = Dialog::OpenFileDialog();
+        FIGURES = Parser::ReadFromFile(file);
         window->setVisible(true);
 
         break;
@@ -304,6 +305,7 @@ void Controller::ShortAction(std::shared_ptr<sf::RenderWindow> window, Form* act
     {
         window->setVisible(false);
         std::string file = Dialog::OpenFileDialog();
+        Parser::SaveToFile(file, FIGURES);
         window->setVisible(true);
 
         break;

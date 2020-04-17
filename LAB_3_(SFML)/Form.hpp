@@ -87,19 +87,15 @@ class Button final: public Form
 private:
 	Token _action;
 
-	char* _info;
-	sf::Sprite _image;
-
 public:
 	Button() : Form(), _action{ Token::None } {}
-	Button(std::shared_ptr<sf::RenderWindow> window, const Token token = Token::None, float const x = 0, float const y = 0, const float width = 0, const float height = 0, const sf::Color color = sf::Color(), sf::Sprite image = sf::Sprite(), State state = State::Inactive, bool rounding = false) : Form(window, x, y, width, height, color, state, rounding), _action{ token } { _image = image; }
-	Button(std::shared_ptr<sf::RenderWindow> window, const Token token = Token::None, const Position pos = { 0, 0 }, const Position size = { 0, 0 }, const sf::Color color = sf::Color(), sf::Sprite image = sf::Sprite(), State state = State::Inactive, bool rounding = false) : Form(window, pos, size, color, state, rounding), _action{ token } { _image = image; }
-	Button(const Button& but) : Form(but._window, but._pos, but._size, but._color, but._state, but._rounding), _action{ but._action } { _image = but._image; }
+	Button(std::shared_ptr<sf::RenderWindow> window, const Token token = Token::None, float const x = 0, float const y = 0, const float width = 0, const float height = 0, const sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, x, y, width, height, color, state, rounding), _action{ token } {}
+	Button(std::shared_ptr<sf::RenderWindow> window, const Token token = Token::None, const Position pos = { 0, 0 }, const Position size = { 0, 0 }, const sf::Color color = sf::Color(), State state = State::Inactive, bool rounding = false) : Form(window, pos, size, color, state, rounding), _action{ token } {}
+	Button(const Button& but) : Form(but._window, but._pos, but._size, but._color, but._state, but._rounding), _action{ but._action } {}
 
 	~Button() {}
 
 	Token GetToken() { return _action; }
-	sf::Sprite GetImage() { return _image; }
 
 	void SetToken(Token token) { _action = token; }
 

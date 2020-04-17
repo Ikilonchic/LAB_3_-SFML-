@@ -29,8 +29,8 @@ void Circle::Update()
 	}
 
 	circ.setFillColor(_color);
-	circ.setRadius(_radius);
-	circ.setOrigin(_radius, _radius);
+	circ.setRadius(_size._x);
+	circ.setOrigin(_size._x, _size._x);
 	circ.setPosition(sf::Vector2f(_pos._x, _pos._y));
 
 	sf::Vector2f scale = circ.getScale();
@@ -48,8 +48,8 @@ Position Circle::GetPoint(const int index)
 
 		Position pos(vec.x, vec.y);
 
-		pos._x -= _radius;
-		pos._y -= _radius;
+		pos._x -= _size._x;
+		pos._y -= _size._x;
 
 		pos._x *= _scale._x;
 		pos._y *= _scale._y;
@@ -115,8 +115,8 @@ void Rectangle::Update()
 	}
 
 	rect.setFillColor(_color);
-	rect.setSize(sf::Vector2f(_width, _height));
-	rect.setOrigin(_width / 2, _height / 2);
+	rect.setSize(sf::Vector2f(_size._x, _size._y));
+	rect.setOrigin(_size._x / 2, _size._y / 2);
 	rect.setPosition(_pos._x, _pos._y);
 	rect.rotate(_angle);
 
@@ -137,8 +137,8 @@ Position Rectangle::GetPoint(const int index)
 
 		Position pos(vec.x, vec.y);
 
-		pos._x -= _width / 2;
-		pos._y -= _height / 2;
+		pos._x -= _size._x / 2;
+		pos._y -= _size._y / 2;
 
 		pos._x *= _scale._x;
 		pos._y *= _scale._y;
@@ -181,7 +181,7 @@ bool Rectangle::OnArea(const float x, const float y)
 
 void Triangle::Update()
 {
-	sf::CircleShape triangle(_radius, 3);
+	sf::CircleShape triangle(_size._x, 3);
 
 	if (_visible)
 	{
@@ -205,7 +205,7 @@ void Triangle::Update()
 
 	triangle.setFillColor(_color);
 	triangle.setPosition(_pos._x, _pos._y);
-	triangle.setOrigin(_radius - 1, _radius - 1);
+	triangle.setOrigin(_size._x - 1, _size._x - 1);
 	triangle.rotate(_angle);
 
 	sf::Vector2f scale = triangle.getScale();
@@ -225,8 +225,8 @@ Position Triangle::GetPoint(const int index)
 
 		Position pos(vec.x, vec.y);
 
-		pos._x -= _radius;
-		pos._y -= _radius;
+		pos._x -= _size._x;
+		pos._y -= _size._x;
 
 		pos._x *= _scale._x;
 		pos._y *= _scale._y;
@@ -318,6 +318,43 @@ bool Star::OnArea(const float x, const float y)
 	for (auto i = 0; i < _shape.getPointCount(); i++)
 	{
 		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+//                                        UnitShape
+//----------------------------------------------------------------------------------------------------
+
+size_t UnitShape::GetPointCount() const
+{
+	size_t count = 0;
+
+	for (auto shape : _elem)
+	{
+		count += shape->GetPointCount();
+	}
+
+	return count;
+}
+
+void UnitShape::Draw()
+{
+	for (auto shape : _elem)
+	{
+		shape->Draw();
+	}
+}
+
+bool UnitShape::OnArea(const float x, const float y)
+{
+	for (auto shape : _elem)
+	{
+		if (!(shape->OnArea(x, y)))
 		{
 			return false;
 		}
@@ -422,41 +459,4 @@ bool Shape::CheckÑollision(Shape* first, Shape* second)
 	}
 
 	return false;
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        UnitShape
-//----------------------------------------------------------------------------------------------------
-
-size_t UnitShape::GetPointCount() const
-{
-	size_t count = 0;
-
-	for (auto shape : _elem)
-	{
-		count += shape->GetPointCount();
-	}
-
-	return count;
-}
-
-void UnitShape::Draw()
-{
-	for (auto shape : _elem)
-	{
-		shape->Draw();
-	}
-}
-
-bool UnitShape::OnArea(const float x, const float y)
-{
-	for (auto shape : _elem)
-	{
-		if (!(shape->OnArea(x, y)))
-		{
-			return false;
-		}
-	}
-
-	return true;
 }

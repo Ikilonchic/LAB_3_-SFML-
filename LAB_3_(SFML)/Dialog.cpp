@@ -8,11 +8,12 @@ std::string Dialog::OpenFileDialog()
 {
     std::string file_name;
 
-    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3");
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "LAB_3");
     window->setFramerateLimit(60);
 
     sf::Event event;
     bool mouse_pressed = false;
+    bool mouse_pressed_on_button = false;
 
     Interface inter;
 
@@ -21,11 +22,14 @@ std::string Dialog::OpenFileDialog()
     Form* focus = nullptr;
 
     Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::OK, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::Cancel, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+
+    TextBox text1(window, { MSG_WIDTH / 2 - BIG_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
+    temp.Add(text1);
 
     inter.SetWindow(window);
     inter.AddPanel(temp);
@@ -41,10 +45,10 @@ std::string Dialog::OpenFileDialog()
             case sf::Event::MouseMoved:
             {
                 cursor = sf::Mouse::getPosition(*window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
 
                 if (!mouse_pressed)
                 {
+                    focus = inter.CheckFocused(cursor.x, cursor.y);
                     inter.DrawFocus(focus);
                 }
 
@@ -57,10 +61,23 @@ std::string Dialog::OpenFileDialog()
                     focus->SetState(State::Active);
                     focus->Draw();
 
+                    mouse_pressed_on_button = true;
+                }
+
+                mouse_pressed = true;
+                break;
+            }
+            case sf::Event::MouseButtonReleased:
+            {
+                inter.DrawFocus(focus);
+
+                if (mouse_pressed_on_button)
+                {
                     switch (dynamic_cast<Button*>(focus)->GetToken())
                     {
                     case Token::OK:
                     {
+                        window->close();
                         return file_name;
                     }
                     case Token::Cancel:
@@ -73,13 +90,10 @@ std::string Dialog::OpenFileDialog()
                     }
                 }
 
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
+                focus = inter.CheckFocused(cursor.x, cursor.y);
                 inter.DrawFocus(focus);
 
+                mouse_pressed_on_button = false;
                 mouse_pressed = false;
                 break;
             }
@@ -116,11 +130,12 @@ Shape* Dialog::OpenFiguresDialog()
 {
     Shape* shape = nullptr;
 
-    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW);
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_HEIGHT, MSG_WIDTH), "LAB_3", WINDOW);
     window->setFramerateLimit(60);
 
     sf::Event event;
     bool mouse_pressed = false;
+    bool mouse_pressed_on_button = false;
 
     Interface inter;
 
@@ -129,11 +144,11 @@ Shape* Dialog::OpenFiguresDialog()
     Form* focus = nullptr;
 
     Panel temp(window, 0, 0, MSG_HEIGHT, MSG_WIDTH, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::circ, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::rect, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 2 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but3(window, Token::triang, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 3 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but4(window, Token::unit, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 4 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but5(window, Token::Cancel, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2 , MSG_WIDTH * 5 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(window, Token::circ, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::rect, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 2 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but3(window, Token::triang, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 3 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but4(window, Token::unit, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 4 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but5(window, Token::Cancel, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2 , MSG_WIDTH * 5 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
@@ -155,10 +170,10 @@ Shape* Dialog::OpenFiguresDialog()
             case sf::Event::MouseMoved:
             {
                 cursor = sf::Mouse::getPosition(*window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
 
                 if (!mouse_pressed)
                 {
+                    focus = inter.CheckFocused(cursor.x, cursor.y);
                     inter.DrawFocus(focus);
                 }
 
@@ -171,20 +186,7 @@ Shape* Dialog::OpenFiguresDialog()
                     focus->SetState(State::Active);
                     focus->Draw();
 
-                    switch (dynamic_cast<Button*>(focus)->GetToken())
-                    {
-                    case Token::OK:
-                    {
-                        return shape;
-                    }
-                    case Token::Cancel:
-                    {
-                        window->close();
-                        break;
-                    }
-                    default:
-                        break;
-                    }
+                    mouse_pressed_on_button = true;
                 }
 
                 mouse_pressed = true;
@@ -194,6 +196,31 @@ Shape* Dialog::OpenFiguresDialog()
             {
                 inter.DrawFocus(focus);
 
+                if (mouse_pressed_on_button)
+                {
+                    switch (dynamic_cast<Button*>(focus)->GetToken())
+                    {
+                    case Token::OK:
+                    {
+                        window->close();
+                        return shape;
+                    }
+                    case Token::Cancel:
+                    {
+                        window->close();
+                        break;
+                    }
+                    default:
+                        /////////////////////////////////////////////////////////////////////
+                        //shape = Factory::MakeShape(dynamic_cast<Button*>(focus)->GetToken());
+                        break;
+                    }
+                }
+
+                focus = inter.CheckFocused(cursor.x, cursor.y);
+                inter.DrawFocus(focus);
+
+                mouse_pressed_on_button = false;
                 mouse_pressed = false;
                 break;
             }
@@ -230,11 +257,12 @@ sf::Color Dialog::OpenColorDialog()
 {
     sf::Color color;
 
-    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW);
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "LAB_3", WINDOW);
     window->setFramerateLimit(60);
 
     sf::Event event;
     bool mouse_pressed = false;
+    bool mouse_pressed_on_button = false;
 
     Interface inter;
 
@@ -243,11 +271,18 @@ sf::Color Dialog::OpenColorDialog()
     Form* focus = nullptr;
 
     Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::OK, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::Cancel, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+
+    TextBox text1(window, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    TextBox text2(window, { MSG_WIDTH * 2 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    TextBox text3(window, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
+    temp.Add(text1);
+    temp.Add(text2);
+    temp.Add(text3);
 
     inter.SetWindow(window);
     inter.AddPanel(temp);
@@ -263,10 +298,10 @@ sf::Color Dialog::OpenColorDialog()
             case sf::Event::MouseMoved:
             {
                 cursor = sf::Mouse::getPosition(*window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
 
                 if (!mouse_pressed)
                 {
+                    focus = inter.CheckFocused(cursor.x, cursor.y);
                     inter.DrawFocus(focus);
                 }
 
@@ -279,10 +314,23 @@ sf::Color Dialog::OpenColorDialog()
                     focus->SetState(State::Active);
                     focus->Draw();
 
+                    mouse_pressed_on_button = true;
+                }
+
+                mouse_pressed = true;
+                break;
+            }
+            case sf::Event::MouseButtonReleased:
+            {
+                inter.DrawFocus(focus);
+
+                if (mouse_pressed_on_button)
+                {
                     switch (dynamic_cast<Button*>(focus)->GetToken())
                     {
                     case Token::OK:
                     {
+                        window->close();
                         return color;
                     }
                     case Token::Cancel:
@@ -295,13 +343,10 @@ sf::Color Dialog::OpenColorDialog()
                     }
                 }
 
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
+                focus = inter.CheckFocused(cursor.x, cursor.y);
                 inter.DrawFocus(focus);
 
+                mouse_pressed_on_button = false;
                 mouse_pressed = false;
                 break;
             }
@@ -343,6 +388,7 @@ Position Dialog::OpenScaleDialog()
 
     sf::Event event;
     bool mouse_pressed = false;
+    bool mouse_pressed_on_button = false;
 
     Interface inter;
 
@@ -351,11 +397,16 @@ Position Dialog::OpenScaleDialog()
     Form* focus = nullptr;
 
     Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::OK, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
-    Button but2(window, Token::Cancel, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, sf::Sprite(), State::Inactive, true);
+    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+
+    TextBox text1(window, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    TextBox text2(window, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
+    temp.Add(text1);
+    temp.Add(text2);
 
     inter.SetWindow(window);
     inter.AddPanel(temp);
@@ -371,10 +422,10 @@ Position Dialog::OpenScaleDialog()
             case sf::Event::MouseMoved:
             {
                 cursor = sf::Mouse::getPosition(*window);
-                focus = inter.CheckFocused(cursor.x, cursor.y);
 
                 if (!mouse_pressed)
                 {
+                    focus = inter.CheckFocused(cursor.x, cursor.y);
                     inter.DrawFocus(focus);
                 }
 
@@ -387,10 +438,23 @@ Position Dialog::OpenScaleDialog()
                     focus->SetState(State::Active);
                     focus->Draw();
 
+                    mouse_pressed_on_button = true;
+                }
+
+                mouse_pressed = true;
+                break;
+            }
+            case sf::Event::MouseButtonReleased:
+            {
+                inter.DrawFocus(focus);
+
+                if (mouse_pressed_on_button)
+                {
                     switch (dynamic_cast<Button*>(focus)->GetToken())
                     {
                     case Token::OK:
                     {
+                        window->close();
                         return pos;
                     }
                     case Token::Cancel:
@@ -403,13 +467,10 @@ Position Dialog::OpenScaleDialog()
                     }
                 }
 
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
+                focus = inter.CheckFocused(cursor.x, cursor.y);
                 inter.DrawFocus(focus);
 
+                mouse_pressed_on_button = false;
                 mouse_pressed = false;
                 break;
             }

@@ -9,11 +9,13 @@
 
 #define _USE_MATH_DEFINES
 
-#include <SFML/Graphics.hpp>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <cmath>
+#include <SFML/Graphics.hpp>
 //#include <Windows.h>
 #include "Position.hpp"
 #include "RoundedRectangleShape.hpp"

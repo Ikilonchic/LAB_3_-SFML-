@@ -1,8 +1,9 @@
 #include "Controller.hpp"
 
-int main()
+auto main() -> int
 {
 	Controller::InitApp();
 
+	system("pause > NUL");
 	return EXIT_SUCCESS;
 }

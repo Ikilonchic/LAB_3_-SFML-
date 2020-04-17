@@ -186,7 +186,47 @@ void Button::Draw()
 
 void TextBox::Draw()
 {
+	sf::Color col = _color;
 
+	if (_state == State::Focused)
+	{
+		col.r = abs((col.r + 30) % 256);
+		col.g = abs((col.g + 30) % 256);
+		col.b = abs((col.b + 30) % 256);
+	}
+	else if (_state == State::Active)
+	{
+		col.r = abs((col.r - 30) % 256);
+		col.g = abs((col.g - 30) % 256);
+		col.b = abs((col.b - 30) % 256);
+	}
+
+	if (!_rounding)
+	{
+		sf::RectangleShape rect;
+
+		rect.setFillColor(col);
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
+		rect.setPosition(_pos._x, _pos._y);
+		rect.setOutlineThickness(4);
+		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
+
+		_window->draw(rect);
+	}
+	else
+	{
+		RoundedRectangleShape rect;
+
+		rect.setCornersRadius(4);
+		rect.setCornerPointCount(5);
+		rect.setFillColor(col);
+		rect.setSize(sf::Vector2f(_size._x, _size._y));
+		rect.setPosition(_pos._x, _pos._y);
+		rect.setOutlineThickness(4);
+		rect.setOutlineColor(sf::Color(abs((col.r - 30) % 256), abs((col.g - 30) % 256), abs((col.b - 30) % 256)));
+
+		_window->draw(rect);
+	}
 }
 
 //----------------------------------------------------------------------------------------------------
