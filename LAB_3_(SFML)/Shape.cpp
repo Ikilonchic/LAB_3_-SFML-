@@ -70,20 +70,63 @@ Position Circle::GetPoint(const int index)
 
 void Circle::Draw()
 {
-	_window->draw(_shape);
-}
-
-bool Circle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < 16; i += 2)
+	if (!(_move == Position(0, 0)))
 	{
-		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
-		{
-			return false;
+		Move(_move._x, _move._y);
+
+		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
+
+		if (!(check == SIDE::NONE_SIDE)) {
+			Move(-_move._x, -_move._y);
+
+			switch (check)
+			{
+			case SIDE::LEFT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::RIGHT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::TOP:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			case SIDE::BOTTOM:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			}
 		}
 	}
 
-	return true;
+	_window->draw(_shape);
+}
+
+SIDE Circle::OnArea(const float x, const float y)
+{
+	for (auto i = 0; i < 16; i += 2)
+	{
+		if (GetPoint(i)._x <= 0) {
+			return SIDE::LEFT;
+		}
+		else if (GetPoint(i)._x >= x) {
+			return SIDE::RIGHT;
+		}
+		else if (GetPoint(i)._y <= 0) {
+			return SIDE::TOP;
+		}
+		else if (GetPoint(i)._y >= y) {
+			return SIDE::BOTTOM;
+		}
+	}
+
+	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -159,20 +202,63 @@ Position Rectangle::GetPoint(const int index)
 
 void Rectangle::Draw()
 {
-	_window->draw(_shape);
-}
-
-bool Rectangle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < _shape.getPointCount(); i++)
+	if (!(_move == Position(0, 0)))
 	{
-		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
-		{
-			return false;
+		Move(_move._x, _move._y);
+
+		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
+
+		if (!(check == SIDE::NONE_SIDE)) {
+			Move(-_move._x, -_move._y);
+
+			switch (check)
+			{
+			case SIDE::LEFT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::RIGHT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::TOP:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			case SIDE::BOTTOM:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			}
 		}
 	}
 
-	return true;
+	_window->draw(_shape);
+}
+
+SIDE Rectangle::OnArea(const float x, const float y)
+{
+	for (auto i = 0; i < _shape.getPointCount(); i++)
+	{
+		if (GetPoint(i)._x <= 0) {
+			return SIDE::LEFT;
+		}
+		else if (GetPoint(i)._x >= x) {
+			return SIDE::RIGHT;
+		}
+		else if (GetPoint(i)._y <= 0) {
+			return SIDE::TOP;
+		}
+		else if (GetPoint(i)._y >= y) {
+			return SIDE::BOTTOM;
+		}
+	}
+
+	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -247,88 +333,136 @@ Position Triangle::GetPoint(const int index)
 
 void Triangle::Draw()
 {
-	_window->draw(_shape);
-}
-
-bool Triangle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < _shape.getPointCount(); i++)
+	if (!(_move == Position(0, 0)))
 	{
-		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
-		{
-			return false;
+		Move(_move._x, _move._y);
+
+		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
+
+		if (!(check == SIDE::NONE_SIDE)) {
+			Move(-_move._x, -_move._y);
+
+			switch (check)
+			{
+			case SIDE::LEFT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::RIGHT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::TOP:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			case SIDE::BOTTOM:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			}
 		}
 	}
 
-	return true;
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Star
-//----------------------------------------------------------------------------------------------------
-
-void Star::Update()
-{
-	sf::CircleShape triangle(_radius, 5);
-
-	if (_visible)
-	{
-		_color.a = 255;
-	}
-	else
-	{
-		_color.a = 0;
-	}
-
-	triangle.setOutlineColor(BLACK);
-
-	if (_outline)
-	{
-		triangle.setOutlineThickness(SMALL_OUTLINE);
-	}
-	else
-	{
-		triangle.setOutlineThickness(0);
-	}
-
-	triangle.setFillColor(_color);
-	triangle.setPosition(_pos._x, _pos._y);
-	triangle.setOrigin(_radius - 1, _radius - 1);
-	triangle.rotate(_angle);
-
-	sf::Vector2f scale = triangle.getScale();
-
-	triangle.scale(scale.x * _scale._x, scale.y * _scale._y);
-
-	_shape = triangle;
-}
-
-Position Star::GetPoint(const int index)
-{
-	return Position();
-}
-
-void Star::Draw()
-{
 	_window->draw(_shape);
 }
 
-bool Star::OnArea(const float x, const float y)
+SIDE Triangle::OnArea(const float x, const float y)
 {
 	for (auto i = 0; i < _shape.getPointCount(); i++)
 	{
-		if (!(GetPoint(i)._x > 0 && GetPoint(i)._y > 0 && GetPoint(i)._x < x && GetPoint(i)._y < y))
-		{
-			return false;
+		if (GetPoint(i)._x <= 0) {
+			return SIDE::LEFT;
+		}
+		else if (GetPoint(i)._x >= x) {
+			return SIDE::RIGHT;
+		}
+		else if (GetPoint(i)._y <= 0) {
+			return SIDE::TOP;
+		}
+		else if (GetPoint(i)._y >= y) {
+			return SIDE::BOTTOM;
 		}
 	}
 
-	return true;
+	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
 //                                        UnitShape
 //----------------------------------------------------------------------------------------------------
+
+void UnitShape::Update()
+{
+	_pos = { 0, 0 };
+
+	_color = sf::Color();
+
+	// Shrink to fit //
+	std::vector<Shape*> temp;
+
+	for (auto shape : _elem)
+	{
+		if (shape->_visible) {
+			temp.push_back(shape->Clone());
+		}
+	}
+
+	_elem = temp;
+
+	// New parameters //
+	for (auto shape : _elem)
+	{
+		_pos._x += shape->_pos._x;
+		_pos._y += shape->_pos._y;
+
+		_color.r += shape->_color.r;
+		_color.g += shape->_color.g;
+		_color.b += shape->_color.b;
+	}
+
+	_pos._x /= _elem.size();
+	_pos._y /= _elem.size();
+
+	_color.r /= _elem.size();
+	_color.g /= _elem.size();
+	_color.b /= _elem.size();
+
+	for (auto shape : _elem) {
+		shape->_window = _window;
+
+		shape->_pos = _pos;
+		shape->_color = _color;
+	}
+}
+
+Position UnitShape::GetPoint(const int index)
+{
+	int elem_index, point_index, count_point = 0;
+
+	for (elem_index = 0; elem_index < _elem.size(); elem_index++) {
+		
+		if (count_point == 0) {
+			if (index < _elem[elem_index]->GetPointCount()) {
+				return _elem[elem_index]->GetPoint(index);
+			}
+		}
+		else {
+			if (index % count_point < _elem[elem_index]->GetPointCount()) {
+				return _elem[elem_index]->GetPoint(index % count_point);
+			}
+		}
+
+
+		count_point += _elem[elem_index]->GetPointCount();
+	}
+
+	return Position();
+}
 
 size_t UnitShape::GetPointCount() const
 {
@@ -344,23 +478,63 @@ size_t UnitShape::GetPointCount() const
 
 void UnitShape::Draw()
 {
+	if (!(_move == Position(0, 0)))
+	{
+		Move(_move._x, _move._y);
+
+		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
+
+		if (!(check == SIDE::NONE_SIDE)) {
+			Move(-_move._x, -_move._y);
+
+			switch (check)
+			{
+			case SIDE::LEFT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::RIGHT:
+			{
+				_move._x = -_move._x;
+				break;
+			}
+			case SIDE::TOP:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			case SIDE::BOTTOM:
+			{
+				_move._y = -_move._y;
+				break;
+			}
+			}
+		}
+	}
+
 	for (auto shape : _elem)
 	{
 		shape->Draw();
 	}
 }
 
-bool UnitShape::OnArea(const float x, const float y)
+SIDE UnitShape::OnArea(const float x, const float y)
 {
 	for (auto shape : _elem)
 	{
 		if (!(shape->OnArea(x, y)))
 		{
-			return false;
+			if (shape->OnArea(x, y) == SIDE::NONE_SIDE) {
+				continue;
+			}
+			else {
+				return shape->OnArea(x, y);
+			}
 		}
 	}
 
-	return true;
+	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------

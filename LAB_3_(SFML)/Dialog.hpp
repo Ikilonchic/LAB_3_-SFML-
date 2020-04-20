@@ -3,7 +3,7 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
-#include "Parser.hpp"
+#include "InfoManager.hpp"
 
 //----------------------------------------------------------------------------------------------------
 //                                        Dialog
@@ -12,8 +12,9 @@
 class Dialog final
 {
 public:
+	// Methods //
 	static std::string OpenFileDialog();
-	static Shape* OpenFiguresDialog();
+	static Shape* OpenFiguresDialog(Factory* fac);
 	static sf::Color OpenColorDialog();
 	static Position OpenScaleDialog();
 };

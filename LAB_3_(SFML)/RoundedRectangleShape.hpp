@@ -5,11 +5,18 @@
 
 #include "Settings.hpp"
 
+//----------------------------------------------------------------------------------------------------
+//                                     Rounded rectangle shape
+//----------------------------------------------------------------------------------------------------
+
 class RoundedRectangleShape : public sf::Shape
 {
 private:
+    // Size //
     sf::Vector2f _size;
+    // Radius //
     float _radius;
+    // Count of points //
     unsigned int _count_point;
 
 public:

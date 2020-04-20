@@ -149,21 +149,21 @@
     <ClCompile Include="Form.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="InfoManager.cpp" />
     <ClCompile Include="Shape.cpp" />
-    <ClCompile Include="ShapeFactory.cpp" />
+    <ClCompile Include="Factory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller.hpp" />
     <ClInclude Include="Dialog.hpp" />
     <ClInclude Include="Form.hpp" />
     <ClInclude Include="Interface.hpp" />
-    <ClInclude Include="Parser.hpp" />
+    <ClInclude Include="InfoManager.hpp" />
     <ClInclude Include="Position.hpp" />
     <ClInclude Include="RoundedRectangleShape.hpp" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Shape.hpp" />
-    <ClInclude Include="ShapeFactory.hpp" />
+    <ClInclude Include="Factory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

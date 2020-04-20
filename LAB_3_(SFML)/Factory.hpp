@@ -9,16 +9,21 @@
 //                                        Shape factory
 //----------------------------------------------------------------------------------------------------
 
-class Factory
+class Factory final
 {
 private:
+	// Render window //
 	std::shared_ptr<sf::RenderWindow> _window;
 
 public:
+	// Constructors //
 	Factory(std::shared_ptr<sf::RenderWindow> window) { _window = window; }
-	~Factory() {}
 
-	static Shape* MakeShape(Token token, std::shared_ptr<sf::RenderWindow> window, const Position pos = { 0, 0 }, const sf::Color color = sf::Color(), const float angle = 0, const Position scale = { 1, 1 });
+	// Destructors //
+	~Factory() {}
+	
+	// Methods //
+	Shape* MakeShape(Token token, const Position pos = { (SC_WIDTH * 3 / 8), (SC_HEIGHT / 2) }, const sf::Color color = sf::Color(64, 64, 64), const float angle = 0, const Position scale = { 1, 1 });
 };
 
 #endif

@@ -10,29 +10,34 @@ std::string Dialog::OpenFileDialog()
 
     std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "LAB_3");
     window->setFramerateLimit(60);
+    window->setKeyRepeatEnabled(false);
 
+    sf::Vector2i cursor;
     sf::Event event;
     bool mouse_pressed = false;
     bool mouse_pressed_on_button = false;
 
     Interface inter;
 
-    sf::Vector2i cursor;
-
     Form* focus = nullptr;
 
-    Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
+    Panel temp1(window, { 0, 0 }, { MSG_WIDTH, MSG_HEIGHT }, PANEL_COLOR, State::Inactive);
+
+    Panel temp2(window, { MSG_WIDTH / 2 - BIG_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
+
     Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
     Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
-    TextBox text1(window, { MSG_WIDTH / 2 - BIG_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
+    sf::Text info(file_name, font, 20);
 
-    temp.Add(but1);
-    temp.Add(but2);
-    temp.Add(text1);
+    temp1.Add(but1);
+    temp1.Add(but2);
 
     inter.SetWindow(window);
-    inter.AddPanel(temp);
+    inter.AddPanel(temp1);
+    inter.AddPanel(temp2);
 
     while (window->isOpen())
     {
@@ -108,12 +113,42 @@ std::string Dialog::OpenFileDialog()
                 {
                     window->close();
                 }
+                else if (event.key.code == sf::Keyboard::Enter)
+                {
+                    window->close();
+                    return file_name;
+                }
+                else if (event.key.code == sf::Keyboard::Backspace && file_name.size() > 0)
+                {
+                    file_name.pop_back();
+                }
+                else if (file_name.size() < 20)
+                {
+                    char symbol = InfoManager::InpFromKey(event.key.code);
+
+                    if (event.key.shift && symbol >= 97 && symbol <= 122) {
+                        file_name += char(symbol - 32);
+                    }
+                    else if(symbol != -1)
+                    {
+                        file_name += symbol;
+                    }
+                }
+
+                info.setString(file_name);
+
+                sf::FloatRect area = info.getLocalBounds();
+                info.setOrigin(area.width / 2, area.height / 2 + info.getLineSpacing() + 5);
+                info.setPosition(sf::Vector2f(temp2.GetPosition()._x + temp2.GetWidth() / 2, temp2.GetPosition()._y + temp2.GetHeight() / 2));
+
                 break;
             }
             default:
                 break;
             }
         }
+
+        window->draw(info);
 
         window->display();
         window->clear();
@@ -126,7 +161,7 @@ std::string Dialog::OpenFileDialog()
 //                                        Figures dialog
 //----------------------------------------------------------------------------------------------------
 
-Shape* Dialog::OpenFiguresDialog()
+Shape* Dialog::OpenFiguresDialog(Factory* fac)
 {
     Shape* shape = nullptr;
 
@@ -143,7 +178,8 @@ Shape* Dialog::OpenFiguresDialog()
 
     Form* focus = nullptr;
 
-    Panel temp(window, 0, 0, MSG_HEIGHT, MSG_WIDTH, PANEL_COLOR, State::Inactive);
+    Panel temp(window, { 0, 0 }, { MSG_HEIGHT, MSG_WIDTH }, PANEL_COLOR, State::Inactive);
+
     Button but1(window, Token::circ, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
     Button but2(window, Token::rect, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 2 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
     Button but3(window, Token::triang, { MSG_HEIGHT / 2 - STANDARD_BUT._x / 2, MSG_WIDTH * 3 / 6 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
@@ -200,21 +236,17 @@ Shape* Dialog::OpenFiguresDialog()
                 {
                     switch (dynamic_cast<Button*>(focus)->GetToken())
                     {
-                    case Token::OK:
-                    {
-                        window->close();
-                        return shape;
-                    }
                     case Token::Cancel:
                     {
-                        window->close();
                         break;
                     }
                     default:
-                        /////////////////////////////////////////////////////////////////////
-                        //shape = Factory::MakeShape(dynamic_cast<Button*>(focus)->GetToken());
-                        break;
+                    {
+                        shape = fac->MakeShape(dynamic_cast<Button*>(focus)->GetToken());
                     }
+                    }
+
+                    window->close();
                 }
 
                 focus = inter.CheckFocused(cursor.x, cursor.y);
@@ -246,7 +278,7 @@ Shape* Dialog::OpenFiguresDialog()
         window->clear();
     }
 
-    return nullptr;
+    return shape;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -255,10 +287,22 @@ Shape* Dialog::OpenFiguresDialog()
 
 sf::Color Dialog::OpenColorDialog()
 {
-    sf::Color color;
+    int index = 0;
+    std::string info[3];
+
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
+    sf::Text text[3];
+    
+    for (auto i = 0; i < 3; i++)
+    {
+        text[i].setFont(font);
+        text[i].setCharacterSize(20);
+    }
 
     std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "LAB_3", WINDOW);
     window->setFramerateLimit(60);
+    window->setKeyRepeatEnabled(false);
 
     sf::Event event;
     bool mouse_pressed = false;
@@ -270,22 +314,23 @@ sf::Color Dialog::OpenColorDialog()
 
     Form* focus = nullptr;
 
-    Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp(window, { 0, 0 }, { MSG_WIDTH, MSG_HEIGHT }, PANEL_COLOR, State::Inactive);
 
-    TextBox text1(window, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    TextBox text2(window, { MSG_WIDTH * 2 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    TextBox text3(window, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp1(window, { MSG_WIDTH / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp2(window, { MSG_WIDTH * 2 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp3(window, { MSG_WIDTH * 3 / 4 - STANDARD_BUT._x / 2, MSG_HEIGHT / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+
+    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 2 / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 2 / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
-    temp.Add(text1);
-    temp.Add(text2);
-    temp.Add(text3);
 
     inter.SetWindow(window);
     inter.AddPanel(temp);
+    inter.AddPanel(temp1);
+    inter.AddPanel(temp2);
+    inter.AddPanel(temp3);
 
     while (window->isOpen())
     {
@@ -331,7 +376,7 @@ sf::Color Dialog::OpenColorDialog()
                     case Token::OK:
                     {
                         window->close();
-                        return color;
+                        return sf::Color(InfoManager::ToNumber<int>(info[0]) % 256, InfoManager::ToNumber<int>(info[1]) % 256, InfoManager::ToNumber<int>(info[2]) % 256);
                     }
                     case Token::Cancel:
                     {
@@ -361,6 +406,67 @@ sf::Color Dialog::OpenColorDialog()
                 {
                     window->close();
                 }
+                else if (event.key.code == sf::Keyboard::Enter)
+                {
+                    if (index == 2)
+                    {
+                        window->close();
+                        return sf::Color(InfoManager::ToNumber<int>(info[0]) % 256, InfoManager::ToNumber<int>(info[1]) % 256, InfoManager::ToNumber<int>(info[2]) % 256);
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+                else if (event.key.code == sf::Keyboard::Backspace)
+                {
+                    if (info[index].size() > 0) {
+                        info[index].pop_back();
+                    }
+                    else if (info[index].size() == 0 && index > 0)
+                    {
+                        index--;
+                        info[index].pop_back();
+                    }
+                }
+                else
+                {
+                    char symbol = InfoManager::InpFromKey(event.key.code);
+
+                    if (symbol == 48 && info[index].size() == 0)
+                    {
+                        info[index] += symbol;
+                        text[index].setString(info[index]);
+                        index++;
+                    }
+                    else if(symbol >= 48 && symbol <= 57)
+                    {
+                        info[index] += symbol;
+                    }
+
+                    if (info[index].size() > 3 && index == 2)
+                    {
+                        info[index].pop_back();
+                    }
+
+                    text[index].setString(info[index]);
+                }
+
+                if (info[index].size() == 3 && index < 2)
+                {
+                    index++;
+                }
+
+                for (auto i = 0; i < 3; i++)
+                {
+                    sf::FloatRect area = text[i].getLocalBounds();
+                    text[i].setOrigin(area.width / 2, area.height / 2 + text[i].getLineSpacing() + 5);
+                }
+
+                text[0].setPosition(sf::Vector2f(temp1.GetPosition()._x + temp1.GetWidth() / 2, temp1.GetPosition()._y + temp1.GetHeight() / 2));
+                text[1].setPosition(sf::Vector2f(temp2.GetPosition()._x + temp2.GetWidth() / 2, temp2.GetPosition()._y + temp2.GetHeight() / 2));
+                text[2].setPosition(sf::Vector2f(temp3.GetPosition()._x + temp3.GetWidth() / 2, temp3.GetPosition()._y + temp3.GetHeight() / 2));
+
                 break;
             }
             default:
@@ -368,11 +474,16 @@ sf::Color Dialog::OpenColorDialog()
             }
         }
 
+        for (auto i = 0; i < 3; i++)
+        {
+            window->draw(text[i]);
+        }
+
         window->display();
         window->clear();
     }
 
-    return sf::Color();
+    return sf::Color(0, 0, 0, 0);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -381,10 +492,22 @@ sf::Color Dialog::OpenColorDialog()
 
 Position Dialog::OpenScaleDialog()
 {
-    Position pos;
+    int index = 0;
+    std::string info[2];
 
-    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(SC_WIDTH, SC_HEIGHT), "LAB_3", WINDOW);
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
+    sf::Text text[2];
+
+    for (auto i = 0; i < 2; i++)
+    {
+        text[i].setFont(font);
+        text[i].setCharacterSize(20);
+    }
+
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_WIDTH, MSG_HEIGHT), "LAB_3", WINDOW);
     window->setFramerateLimit(60);
+    window->setKeyRepeatEnabled(false);
 
     sf::Event event;
     bool mouse_pressed = false;
@@ -396,20 +519,21 @@ Position Dialog::OpenScaleDialog()
 
     Form* focus = nullptr;
 
-    Panel temp(window, 0, 0, MSG_WIDTH, MSG_HEIGHT, PANEL_COLOR, State::Inactive);
-    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 3 / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp(window, { 0, 0 }, { MSG_WIDTH, MSG_HEIGHT }, PANEL_COLOR, State::Inactive);
 
-    TextBox text1(window, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    TextBox text2(window, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 4 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp1(window, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Panel temp2(window, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+
+    Button but1(window, Token::OK, { MSG_WIDTH / 3 - STANDARD_BUT._x / 2, MSG_HEIGHT * 2 / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but2(window, Token::Cancel, { MSG_WIDTH * 2 / 3 - STANDARD_BUT._x / 2 , MSG_HEIGHT * 2 / 3 - STANDARD_BUT._y / 2 }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
-    temp.Add(text1);
-    temp.Add(text2);
 
     inter.SetWindow(window);
     inter.AddPanel(temp);
+    inter.AddPanel(temp1);
+    inter.AddPanel(temp2);
 
     while (window->isOpen())
     {
@@ -455,7 +579,7 @@ Position Dialog::OpenScaleDialog()
                     case Token::OK:
                     {
                         window->close();
-                        return pos;
+                        return Position(InfoManager::ToNumber<int>(info[0]) % 10, InfoManager::ToNumber<int>(info[1]) % 10);
                     }
                     case Token::Cancel:
                     {
@@ -485,6 +609,68 @@ Position Dialog::OpenScaleDialog()
                 {
                     window->close();
                 }
+                else if (event.key.code == sf::Keyboard::Enter)
+                {
+                    if (index == 1)
+                    {
+                        window->close();
+                        return Position(InfoManager::ToNumber<int>(info[0]) % 10, InfoManager::ToNumber<int>(info[1]) % 10);
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+                else if (event.key.code == sf::Keyboard::Backspace)
+                {
+                    if (info[index].size() > 0) {
+                        info[index].pop_back();
+                        text[index].setString(info[index]);
+                    }
+                    else if (info[index].size() == 0 && index > 0)
+                    {
+                        index--;
+                        info[index].pop_back();
+                        text[index].setString(info[index]);
+                    }
+                }
+                else
+                {
+                    char symbol = InfoManager::InpFromKey(event.key.code);
+
+                    if (symbol == 48 && info[index].size() == 0)
+                    {
+                        info[index] += symbol;
+                        text[index].setString(info[index]);
+                        index++;
+                    }
+                    else if (symbol >= 48 && symbol <= 57)
+                    {
+                        info[index] += symbol;
+                    }
+
+                    if (info[index].size() > 2 && index == 1)
+                    {
+                        info[index].pop_back();
+                    }
+
+                    text[index].setString(info[index]);
+                }
+
+                if (info[index].size() == 2 && index < 1)
+                {
+                    index++;
+                }
+
+                for (auto i = 0; i < 2; i++)
+                {
+                    sf::FloatRect area = text[i].getLocalBounds();
+                    text[i].setOrigin(area.width / 2, area.height / 2 + text[i].getLineSpacing() + 5);
+                }
+
+                text[0].setPosition(sf::Vector2f(temp1.GetPosition()._x + temp1.GetWidth() / 2, temp1.GetPosition()._y + temp1.GetHeight() / 2));
+                text[1].setPosition(sf::Vector2f(temp2.GetPosition()._x + temp2.GetWidth() / 2, temp2.GetPosition()._y + temp2.GetHeight() / 2));
+
                 break;
             }
             default:
@@ -492,9 +678,14 @@ Position Dialog::OpenScaleDialog()
             }
         }
 
+        for (auto i = 0; i < 2; i++)
+        {
+            window->draw(text[i]);
+        }
+
         window->display();
         window->clear();
     }
 
-    return Position();
+    return Position(1, 1);
 }

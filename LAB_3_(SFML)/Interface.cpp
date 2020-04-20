@@ -23,7 +23,7 @@ bool Interface::CheckOverlay(Form& form)
 	{
 		if (*a == form)
 		{
-			return false;
+			//return false;
 		}
 	}
 
