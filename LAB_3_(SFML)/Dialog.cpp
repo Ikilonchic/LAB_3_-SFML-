@@ -579,7 +579,7 @@ Position Dialog::OpenScaleDialog()
                     case Token::OK:
                     {
                         window->close();
-                        return Position(InfoManager::ToNumber<int>(info[0]) % 10, InfoManager::ToNumber<int>(info[1]) % 10);
+                        return Position(InfoManager::ToNumber<float>(info[0]), InfoManager::ToNumber<float>(info[1]));
                     }
                     case Token::Cancel:
                     {
@@ -614,7 +614,7 @@ Position Dialog::OpenScaleDialog()
                     if (index == 1)
                     {
                         window->close();
-                        return Position(InfoManager::ToNumber<int>(info[0]) % 10, InfoManager::ToNumber<int>(info[1]) % 10);
+                        return Position(InfoManager::ToNumber<float>(info[0]), InfoManager::ToNumber<float>(info[1]));
                     }
                     else
                     {
@@ -644,12 +644,16 @@ Position Dialog::OpenScaleDialog()
                         text[index].setString(info[index]);
                         index++;
                     }
-                    else if (symbol >= 48 && symbol <= 57)
+                    else if ((symbol >= 48 && symbol <= 57))
+                    {
+                        info[index] += symbol;
+                    }
+                    else if (symbol == '.')
                     {
                         info[index] += symbol;
                     }
 
-                    if (info[index].size() > 2 && index == 1)
+                    if (info[index].size() > 4 && index == 1)
                     {
                         info[index].pop_back();
                     }
@@ -657,7 +661,7 @@ Position Dialog::OpenScaleDialog()
                     text[index].setString(info[index]);
                 }
 
-                if (info[index].size() == 2 && index < 1)
+                if (info[index].size() == 4 && index < 1)
                 {
                     index++;
                 }

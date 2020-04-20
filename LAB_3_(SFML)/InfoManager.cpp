@@ -171,6 +171,9 @@ char InfoManager::InpFromKey(sf::Keyboard::Key key)
     case sf::Keyboard::Numpad9:
         return '9';
         break;
+    case sf::Keyboard::Period:
+        return '.';
+        break;
     default:
         return -1;
         break;
