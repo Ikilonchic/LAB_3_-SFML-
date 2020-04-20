@@ -291,7 +291,7 @@ void Triangle::Update()
 
 	triangle.setFillColor(_color);
 	triangle.setPosition(_pos._x, _pos._y);
-	triangle.setOrigin(_size._x - 1, _size._x - 1);
+	triangle.setOrigin(_size._x, _size._x);
 	triangle.rotate(_angle);
 
 	sf::Vector2f scale = triangle.getScale();
@@ -510,11 +510,18 @@ void UnitShape::Draw()
 				break;
 			}
 			}
+
+			SetMove(_move);
 		}
 	}
 
+	// Restoring position on the first element //
+	Position temp = _elem[0]->_pos;
+
 	for (auto shape : _elem)
 	{
+		shape->_pos = temp;
+
 		shape->Draw();
 	}
 }
@@ -523,14 +530,11 @@ SIDE UnitShape::OnArea(const float x, const float y)
 {
 	for (auto shape : _elem)
 	{
-		if (!(shape->OnArea(x, y)))
-		{
-			if (shape->OnArea(x, y) == SIDE::NONE_SIDE) {
-				continue;
-			}
-			else {
-				return shape->OnArea(x, y);
-			}
+		if (shape->OnArea(x, y) == SIDE::NONE_SIDE) {
+			continue;
+		}
+		else {
+			return shape->OnArea(x, y);
 		}
 	}
 

@@ -105,11 +105,14 @@ void Controller::InitApp()
                 }
                 else if (event.key.code == sf::Keyboard::Enter)
                 {
-                    FIGURES.push_back(new UnitShape(MAIN_WINDOW, UNIT_FIGURES));
+                    if (!UNIT_FIGURES.empty()) {
+                        FIGURES.push_back(new UnitShape(MAIN_WINDOW, UNIT_FIGURES));
+                        INDEX = FIGURES.size() - 1;
+                    }
+
                     UNIT_FIGURES.clear();
                     UNIT_INDEX = 0;
                     MODE = WINDOW_MODE::Standard;
-                    INDEX = FIGURES.size() - 1;
                 }
                 else if (event.key.code == sf::Keyboard::Space)
                 {
@@ -216,33 +219,7 @@ void Controller::DrawFigures(WINDOW_MODE mode)
         for (auto shape : FIGURES)
         {
             if (shape->GetMove() == Position(0, 0)) {
-                switch (rand() % 4)
-                {
-                case 0:
-                {
-                    shape->SetMove({ 2, 2 });
-                    break;
-                }
-                case 1:
-                {
-                    shape->SetMove({ -2, -2 });
-                    break;
-                }
-                case 2:
-                {
-                    shape->SetMove({ 2, -2 });
-                    break;
-                }
-                case 3:
-                {
-                    shape->SetMove({ -2, 2 });
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
-                }
+                shape->SetMove(Position(rand() % 3, rand() % 3));
             }
         }
 
