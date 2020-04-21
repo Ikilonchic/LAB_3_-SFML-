@@ -39,8 +39,7 @@
 #define WINDOW sf::Style::Default
 #define NONE sf::Style::None
 
-enum SIDE
-{
+enum SIDE {
 	NONE_SIDE,
 	LEFT,
 	RIGHT,
@@ -52,11 +51,8 @@ enum SIDE
 //                                        INTERFACE
 //----------------------------------------------------------------------------------------------------
 
-enum WINDOW_MODE
-{
-	Standard,
-	Standby,
-	ShapeSelection
+enum WINDOW_MODE {
+	Standard, Standby, ShapeSelection
 };
 
 // Color //

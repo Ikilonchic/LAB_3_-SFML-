@@ -26,13 +26,11 @@ public:
 
 	// Conversion to number //
 	template<class T>
-	static T ToNumber(std::string number)
-	{
+	static T ToNumber(std::string number) {
 		T result;
 		std::istringstream ist(number);
 
 		ist >> result;
-
 		return result;
 	}
 

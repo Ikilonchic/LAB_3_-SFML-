@@ -1,32 +1,117 @@
 #include "Shape.hpp"
 
 //----------------------------------------------------------------------------------------------------
+//                                        Shape
+//----------------------------------------------------------------------------------------------------
+
+void Shape::AutoMove() {
+	if (!(_move == Position(0, 0))) {
+		Move(_move._x, _move._y);
+
+		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
+
+		if (!(check == SIDE::NONE_SIDE)) {
+			Move(-_move._x, -_move._y);
+
+			switch (check) {
+				case SIDE::LEFT:
+					_move._x = -_move._x;
+					break;
+				case SIDE::RIGHT:
+					_move._x = -_move._x;
+					break;
+				case SIDE::TOP:
+					_move._y = -_move._y;
+					break;
+				case SIDE::BOTTOM:
+					_move._y = -_move._y;
+					break;
+			}
+			SetMove(_move);
+		}
+	}
+}
+
+SIDE Shape::OnArea(const float xa, const float ya) {
+	for (auto i = 0; i < GetPointCount(); i++) {
+		if (GetPoint(i)._x <= 0) {
+			return SIDE::LEFT;
+		}
+		else if (GetPoint(i)._x >= xa) {
+			return SIDE::RIGHT;
+		}
+		else if (GetPoint(i)._y <= 0) {
+			return SIDE::TOP;
+		}
+		else if (GetPoint(i)._y >= ya) {
+			return SIDE::BOTTOM;
+		}
+	}
+	return SIDE::NONE_SIDE;
+}
+
+bool Shape::CheckÑollision(Shape* first, Shape* second) {
+	Position temp;
+
+	if (first->GetPosition()._x - second->GetPosition()._x < 0) {
+		temp._x = -1000;
+	}
+	else if (first->GetPosition()._x - second->GetPosition()._x > 0) {
+		temp._x = 1000;
+	}
+
+	if (first->GetPosition()._y - second->GetPosition()._y < 0) {
+		temp._y = -1000;
+	}
+	else if (first->GetPosition()._y - second->GetPosition()._y > 0) {
+		temp._y = 1000;
+	}
+
+	for (size_t i = 0; i < first->GetPointCount(); i++) {
+		for (size_t j = 0; j < second->GetPointCount(); j++) {
+			if (Position::AreCrossing(temp, first->GetPoint(i), second->GetPoint(j), second->GetPoint((j + 1) % second->GetPointCount()))) {
+				return true;
+			}
+		}
+	}
+
+	if (second->GetPosition()._x - first->GetPosition()._x < 0) {
+		temp._x = -1000;
+	}
+	else if (second->GetPosition()._x - first->GetPosition()._x > 0) {
+		temp._x = 1000;
+	}
+
+	if (second->GetPosition()._y - first->GetPosition()._y < 0) {
+		temp._y = -1000;
+	}
+	else if (second->GetPosition()._y - first->GetPosition()._y > 0) {
+		temp._y = 1000;
+	}
+
+	for (size_t i = 0; i < second->GetPointCount(); i++) {
+		for (size_t j = 0; j < first->GetPointCount(); j++) {
+			if (Position::AreCrossing(temp, second->GetPoint(i), first->GetPoint(j), first->GetPoint((j + 1) % first->GetPointCount()))) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+//----------------------------------------------------------------------------------------------------
 //                                        Circle
 //----------------------------------------------------------------------------------------------------
 
-void Circle::Update()
-{
+void Circle::Update() {
 	sf::CircleShape circ;
 
-	if (_visible)
-	{
-		_color.a = 255;
-	}
-	else
-	{
-		_color.a = 0;
-	}
+	_color.a = _visible ? 255 : 0;
 
 	circ.setOutlineColor(BLACK);
 
-	if (_outline)
-	{
-		circ.setOutlineThickness(SMALL_OUTLINE);
-	}
-	else
-	{
-		circ.setOutlineThickness(0);
-	}
+	circ.setOutlineThickness(_outline ? SMALL_OUTLINE : 0);
 
 	circ.setFillColor(_color);
 	circ.setRadius(_size._x);
@@ -40,10 +125,8 @@ void Circle::Update()
 	_shape = circ;
 }
 
-Position Circle::GetPoint(const int index)
-{
-	if (index < 16)
-	{
+Position Circle::GetPoint(const int index) {
+	if (index < 16) {
 		sf::Vector2f vec = _shape.getPoint(index * _shape.getPointCount() / 16);
 
 		Position pos(vec.x, vec.y);
@@ -68,94 +151,23 @@ Position Circle::GetPoint(const int index)
 	return Position();
 }
 
-void Circle::Draw()
-{
-	if (!(_move == Position(0, 0)))
-	{
-		Move(_move._x, _move._y);
-
-		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
-
-		if (!(check == SIDE::NONE_SIDE)) {
-			Move(-_move._x, -_move._y);
-
-			switch (check)
-			{
-			case SIDE::LEFT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::RIGHT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::TOP:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			case SIDE::BOTTOM:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			}
-		}
-	}
-
+void Circle::Draw() {
+	AutoMove();
 	_window->draw(_shape);
-}
-
-SIDE Circle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < 16; i += 2)
-	{
-		if (GetPoint(i)._x <= 0) {
-			return SIDE::LEFT;
-		}
-		else if (GetPoint(i)._x >= x) {
-			return SIDE::RIGHT;
-		}
-		else if (GetPoint(i)._y <= 0) {
-			return SIDE::TOP;
-		}
-		else if (GetPoint(i)._y >= y) {
-			return SIDE::BOTTOM;
-		}
-	}
-
-	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
 //                                        Rectangle
 //----------------------------------------------------------------------------------------------------
 
-void Rectangle::Update()
-{
+void Rectangle::Update() {
 	sf::RectangleShape rect;
 
-	if (_visible)
-	{
-		_color.a = 255;
-	}
-	else
-	{
-		_color.a = 0;
-	}
+	_color.a = _visible ? 255 : 0;
 
 	rect.setOutlineColor(BLACK);
 
-	if (_outline)
-	{
-		rect.setOutlineThickness(SMALL_OUTLINE);
-	}
-	else
-	{
-		rect.setOutlineThickness(0);
-	}
+	rect.setOutlineThickness(_outline ? SMALL_OUTLINE : 0);
 
 	rect.setFillColor(_color);
 	rect.setSize(sf::Vector2f(_size._x, _size._y));
@@ -170,12 +182,8 @@ void Rectangle::Update()
 	_shape = rect;
 }
 
-Position Rectangle::GetPoint(const int index)
-{
-	size_t count = _shape.getPointCount();
-
-	if (index < count)
-	{
+Position Rectangle::GetPoint(const int index) {
+	if (index < GetPointCount()) {
 		sf::Vector2f vec = _shape.getPoint(index);
 
 		Position pos(vec.x, vec.y);
@@ -200,94 +208,23 @@ Position Rectangle::GetPoint(const int index)
 	return Position();
 }
 
-void Rectangle::Draw()
-{
-	if (!(_move == Position(0, 0)))
-	{
-		Move(_move._x, _move._y);
-
-		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
-
-		if (!(check == SIDE::NONE_SIDE)) {
-			Move(-_move._x, -_move._y);
-
-			switch (check)
-			{
-			case SIDE::LEFT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::RIGHT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::TOP:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			case SIDE::BOTTOM:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			}
-		}
-	}
-
+void Rectangle::Draw() {
+	AutoMove();
 	_window->draw(_shape);
-}
-
-SIDE Rectangle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < _shape.getPointCount(); i++)
-	{
-		if (GetPoint(i)._x <= 0) {
-			return SIDE::LEFT;
-		}
-		else if (GetPoint(i)._x >= x) {
-			return SIDE::RIGHT;
-		}
-		else if (GetPoint(i)._y <= 0) {
-			return SIDE::TOP;
-		}
-		else if (GetPoint(i)._y >= y) {
-			return SIDE::BOTTOM;
-		}
-	}
-
-	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
 //                                        Triangle
 //----------------------------------------------------------------------------------------------------
 
-void Triangle::Update()
-{
+void Triangle::Update() {
 	sf::CircleShape triangle(_size._x, 3);
 
-	if (_visible)
-	{
-		_color.a = 255;
-	}
-	else
-	{
-		_color.a = 0;
-	}
+	_color.a = _visible ? 255 : 0;
 
 	triangle.setOutlineColor(BLACK);
 
-	if (_outline)
-	{
-		triangle.setOutlineThickness(SMALL_OUTLINE);
-	}
-	else
-	{
-		triangle.setOutlineThickness(0);
-	}
+	triangle.setOutlineThickness(_outline ? SMALL_OUTLINE : 0);
 
 	triangle.setFillColor(_color);
 	triangle.setPosition(_pos._x, _pos._y);
@@ -301,12 +238,8 @@ void Triangle::Update()
 	_shape = triangle;
 }
 
-Position Triangle::GetPoint(const int index)
-{
-	size_t count = _shape.getPointCount();
-
-	if (index < count)
-	{
+Position Triangle::GetPoint(const int index) {
+	if (index < GetPointCount()) {
 		sf::Vector2f vec = _shape.getPoint(index);
 
 		Position pos(vec.x, vec.y);
@@ -331,73 +264,16 @@ Position Triangle::GetPoint(const int index)
 	return Position();
 }
 
-void Triangle::Draw()
-{
-	if (!(_move == Position(0, 0)))
-	{
-		Move(_move._x, _move._y);
-
-		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
-
-		if (!(check == SIDE::NONE_SIDE)) {
-			Move(-_move._x, -_move._y);
-
-			switch (check)
-			{
-			case SIDE::LEFT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::RIGHT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::TOP:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			case SIDE::BOTTOM:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			}
-		}
-	}
-
+void Triangle::Draw() {
+	AutoMove();
 	_window->draw(_shape);
-}
-
-SIDE Triangle::OnArea(const float x, const float y)
-{
-	for (auto i = 0; i < _shape.getPointCount(); i++)
-	{
-		if (GetPoint(i)._x <= 0) {
-			return SIDE::LEFT;
-		}
-		else if (GetPoint(i)._x >= x) {
-			return SIDE::RIGHT;
-		}
-		else if (GetPoint(i)._y <= 0) {
-			return SIDE::TOP;
-		}
-		else if (GetPoint(i)._y >= y) {
-			return SIDE::BOTTOM;
-		}
-	}
-
-	return SIDE::NONE_SIDE;
 }
 
 //----------------------------------------------------------------------------------------------------
 //                                        UnitShape
 //----------------------------------------------------------------------------------------------------
 
-void UnitShape::Update()
-{
+void UnitShape::Update() {
 	_pos = { 0, 0 };
 
 	_color = sf::Color();
@@ -405,8 +281,7 @@ void UnitShape::Update()
 	// Shrink to fit //
 	std::vector<Shape*> temp;
 
-	for (auto shape : _elem)
-	{
+	for (auto shape : _elem) {
 		if (shape->_visible) {
 			temp.push_back(shape->Clone());
 		}
@@ -415,8 +290,7 @@ void UnitShape::Update()
 	_elem = temp;
 
 	// New parameters //
-	for (auto shape : _elem)
-	{
+	for (auto shape : _elem) {
 		_pos._x += shape->_pos._x;
 		_pos._y += shape->_pos._y;
 
@@ -437,11 +311,12 @@ void UnitShape::Update()
 
 		shape->_pos = _pos;
 		shape->_color = _color;
+
+		shape->Update();
 	}
 }
 
-Position UnitShape::GetPoint(const int index)
-{
+Position UnitShape::GetPoint(const int index) {
 	int elem_index, point_index, count_point = 0;
 
 	for (elem_index = 0; elem_index < _elem.size(); elem_index++) {
@@ -464,177 +339,24 @@ Position UnitShape::GetPoint(const int index)
 	return Position();
 }
 
-size_t UnitShape::GetPointCount() const
-{
+size_t UnitShape::GetPointCount() const {
 	size_t count = 0;
 
-	for (auto shape : _elem)
-	{
+	for (auto shape : _elem) {
 		count += shape->GetPointCount();
 	}
 
 	return count;
 }
 
-void UnitShape::Draw()
-{
-	if (!(_move == Position(0, 0)))
-	{
-		Move(_move._x, _move._y);
-
-		SIDE check = OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT);
-
-		if (!(check == SIDE::NONE_SIDE)) {
-			Move(-_move._x, -_move._y);
-
-			switch (check)
-			{
-			case SIDE::LEFT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::RIGHT:
-			{
-				_move._x = -_move._x;
-				break;
-			}
-			case SIDE::TOP:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			case SIDE::BOTTOM:
-			{
-				_move._y = -_move._y;
-				break;
-			}
-			}
-
-			SetMove(_move);
-		}
-	}
+void UnitShape::Draw() {
+	AutoMove();
 
 	// Restoring position on the first element //
 	Position temp = _elem[0]->_pos;
 
-	for (auto shape : _elem)
-	{
-		shape->_pos = temp;
-
+	for (auto shape : _elem) {
+		shape->SetPosition(temp);
 		shape->Draw();
 	}
-}
-
-SIDE UnitShape::OnArea(const float x, const float y)
-{
-	for (auto shape : _elem)
-	{
-		if (shape->OnArea(x, y) == SIDE::NONE_SIDE) {
-			continue;
-		}
-		else {
-			return shape->OnArea(x, y);
-		}
-	}
-
-	return SIDE::NONE_SIDE;
-}
-
-//----------------------------------------------------------------------------------------------------
-//                                        Check collision
-//----------------------------------------------------------------------------------------------------
-
-bool AreCrossing(const Position A, const Position B, const Position C, const Position D)
-{
-	double denominator;
-
-	denominator = (D._y - C._y) * (A._x - B._x) - (D._x - C._x) * (A._y - B._y);
-
-	if (denominator == 0)
-	{
-		if ((A._x * B._y - B._x * A._y) * (D._x - C._x) - (C._x * D._y - D._x * C._y) * (B._x - A._x) == 0 && (A._x * B._y - B._x * A._y) * (D._y - C._y) - (C._x * D._y - D._x * C._y) * (B._y - A._y) == 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		double numerator_a = (D._x - B._x) * (D._y - C._y) - (D._x - C._x) * (D._y - B._y);
-		double numerator_b = (A._x - B._x) * (D._y - B._y) - (D._x - B._x) * (A._y - B._y);
-
-		double Ua = numerator_a / denominator;
-		double Ub = numerator_b / denominator;
-
-		return Ua >= 0 && Ua <= 1 && Ub >= 0 && Ub <= 1 ? true : false;
-	}
-}
-
-bool Shape::CheckÑollision(Shape* first, Shape* second)
-{
-	Position temp;
-
-	if (first->GetPosition()._x - second->GetPosition()._x < 0)
-	{
-		temp._x = -1000;
-	}
-	else if (first->GetPosition()._x - second->GetPosition()._x > 0)
-	{
-		temp._x = 1000;
-	}
-
-	if (first->GetPosition()._y - second->GetPosition()._y < 0)
-	{
-		temp._y = -1000;
-	}
-	else if (first->GetPosition()._y - second->GetPosition()._y > 0)
-	{
-		temp._y = 1000;
-	}
-
-	for (size_t i = 0; i < first->GetPointCount(); i++)
-	{
-		for (size_t j = 0; j < second->GetPointCount(); j++)
-		{
-			if (AreCrossing(temp, first->GetPoint(i), second->GetPoint(j), second->GetPoint((j + 1) % second->GetPointCount())))
-			{
-				return true;
-			}
-		}
-	}
-
-	if (second->GetPosition()._x - first->GetPosition()._x < 0)
-	{
-		temp._x = -1000;
-	}
-	else if (second->GetPosition()._x - first->GetPosition()._x > 0)
-	{
-		temp._x = 1000;
-	}
-
-	if (second->GetPosition()._y - first->GetPosition()._y < 0)
-	{
-		temp._y = -1000;
-	}
-	else if (second->GetPosition()._y - first->GetPosition()._y > 0)
-	{
-		temp._y = 1000;
-	}
-
-	for (size_t i = 0; i < second->GetPointCount(); i++)
-	{
-		for (size_t j = 0; j < first->GetPointCount(); j++)
-		{
-			if (AreCrossing(temp, second->GetPoint(i), first->GetPoint(j), first->GetPoint((j + 1) % first->GetPointCount())))
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
 }

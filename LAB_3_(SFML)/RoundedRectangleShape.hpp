@@ -20,51 +20,42 @@ private:
     unsigned int _count_point;
 
 public:
-    explicit RoundedRectangleShape(const sf::Vector2f& size = sf::Vector2f(0, 0), float radius = 0, unsigned int cornerPointCount = 0)
-    {
+    explicit RoundedRectangleShape(const sf::Vector2f& size = sf::Vector2f(0, 0), float radius = 0, unsigned int cornerPointCount = 0) {
         _size = size;
         _radius = radius;
         _count_point = cornerPointCount;
         update();
     }
 
-    void setSize(const sf::Vector2f& size)
-    {
+    void setSize(const sf::Vector2f& size) {
         _size = size;
         update();
     }
 
-    const sf::Vector2f& getSize() const
-    {
+    const sf::Vector2f& getSize() const {
         return _size;
     }
 
-    void setCornersRadius(float radius)
-    {
+    void setCornersRadius(float radius) {
         _radius = radius;
         update();
     }
 
-    float getCornersRadius() const
-    {
+    float getCornersRadius() const {
         return _radius;
     }
 
-    void setCornerPointCount(unsigned int count)
-    {
+    void setCornerPointCount(unsigned int count) {
         _count_point = count;
         update();
     }
 
-    virtual std::size_t getPointCount() const
-    {
+    virtual std::size_t getPointCount() const {
         return _count_point * 4;
     }
 
-    virtual sf::Vector2f getPoint(std::size_t index) const
-    {
-        if (index >= _count_point * 4)
-        {
+    virtual sf::Vector2f getPoint(std::size_t index) const {
+        if (index >= _count_point * 4) {
             return sf::Vector2f(0, 0);
         }
 
@@ -73,8 +64,7 @@ public:
         unsigned int centerIndex = index / _count_point;
         static const float pi = 3.141592654f;
 
-        switch (centerIndex)
-        {
+        switch (centerIndex) {
             case 0: center.x = _size.x - _radius; center.y = _radius; break;
             case 1: center.x = _radius; center.y = _radius; break;
             case 2: center.x = _radius; center.y = _size.y - _radius; break;

@@ -4,52 +4,39 @@
 //                                        Form
 //----------------------------------------------------------------------------------------------------
 
-bool operator==(Form& a, Form& b)
-{
-	if (a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
-	{
+bool operator==(Form& a, Form& b) {
+	if (a._pos._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y) {
 		return true;
 	}
-	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
-	{
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y) {
 		return true;
 	}
-	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y)
-	{
+	else if (a._pos._x + a._size._x >= b._pos._x && a._pos._y >= b._pos._y && a._pos._x + a._size._x <= b._pos._x + b._size._x && a._pos._y <= b._pos._y + b._size._y) {
 		return true;
 	}
-	else if (a._pos._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y)
-	{
+	else if (a._pos._x >= b._pos._x && a._pos._y + a._size._y >= b._pos._y && a._pos._x <= b._pos._x + b._size._x && a._pos._y + a._size._y <= b._pos._y + b._size._y) {
 		return true;
 	}
 
-	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
-	{
+	if (b._pos._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y) {
 		return true;
 	}
-	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
-	{
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y) {
 		return true;
 	}
-	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y)
-	{
+	else if (b._pos._x + b._size._x >= a._pos._x && b._pos._y >= a._pos._y && b._pos._x + b._size._x <= a._pos._x + a._size._x && b._pos._y <= a._pos._y + a._size._y) {
 		return true;
 	}
-	else if (b._pos._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y)
-	{
+	else if (b._pos._x >= a._pos._x && b._pos._y + b._size._y >= a._pos._y && b._pos._x <= a._pos._x + a._size._x && b._pos._y + b._size._y <= a._pos._y + a._size._y) {
 		return true;
 	}
-
 	return false;
 }
 
-bool operator==(Form& a, Position& b)
-{
-	if (b._x >= a._pos._x && b._y >= a._pos._y && b._x <= a._pos._x + a.GetWidth() && b._y <= a._pos._y + a.GetHeight())
-	{
+bool operator==(Form& a, Position& b) {
+	if (b._x >= a._pos._x && b._y >= a._pos._y && b._x <= a._pos._x + a.GetWidth() && b._y <= a._pos._y + a.GetHeight()) {
 		return true;
 	}
-
 	return false;
 }
 
@@ -57,25 +44,21 @@ bool operator==(Form& a, Position& b)
 //                                        Buttom
 //----------------------------------------------------------------------------------------------------
 
-void Button::Draw()
-{
+void Button::Draw() {
 	sf::Color col = _color;
 
-	if (_state == State::Focused)
-	{
+	if (_state == State::Focused) {
 		col.r = abs((col.r + 30) % 256);
 		col.g = abs((col.g + 30) % 256);
 		col.b = abs((col.b + 30) % 256);
 	}
-	else if (_state == State::Active)
-	{
+	else if (_state == State::Active) {
 		col.r = abs((col.r - 30) % 256);
 		col.g = abs((col.g - 30) % 256);
 		col.b = abs((col.b - 30) % 256);
 	}
 
-	if (!_rounding)
-	{
+	if (!_rounding) {
 		sf::RectangleShape rect;
 
 		rect.setFillColor(col);
@@ -86,8 +69,7 @@ void Button::Draw()
 
 		_window->draw(rect);
 	}
-	else
-	{
+	else {
 		RoundedRectangleShape rect;
 
 		rect.setCornersRadius(4);
@@ -105,72 +87,71 @@ void Button::Draw()
 	font.loadFromFile("arial.ttf");
 	sf::Text info("", font, 20);
 
-	switch (_action)
-	{
-	case None:
-		break;
-	case OK:
-		info.setString("OK");
-		break;
-	case Cancel:
-		info.setString("Cancel");
-		break;
-	case Left:
-		info.setString(L'←');
-		break;
-	case Right:
-		info.setString(L'→');
-		break;
-	case Up:
-		info.setString(L'↑');
-		break;
-	case Down:
-		info.setString(L'↓');
-		break;
-	case Trail:
-		info.setString(L'○');
-		break;
-	case ReadFromFile:
-		info.setString("Read from file");
-		break;
-	case SaveToFile:
-		info.setString("Save to file");
-		break;
-	case Add:
-		info.setString("Add");
-		break;
-	case Delete:
-		info.setString("Delete");
-		break;
-	case Next:
-		info.setString("Next");
-		break;
-	case Prev:
-		info.setString("Prev");
-		break;
-	case SelectColor:
-		info.setString("Color");
-		break;
-	case SelectScale:
-		info.setString("Scale");
-		break;
-	case Hide_Show:
-		info.setString("Hide/Show");
-		break;
-	case circ:
-		info.setString("Circle");
-		break;
-	case rect:
-		info.setString("Rectangle");
-		break;
-	case triang:
-		info.setString("Triangle");
-		break;
-	case unit:
-		info.setString("Unit shape");
-		break;
-	default:
-		break;
+	switch (_action) {
+		case None:
+			break;
+		case OK:
+			info.setString("OK");
+			break;
+		case Cancel:
+			info.setString("Cancel");
+			break;
+		case Left:
+			info.setString(L'←');
+			break;
+		case Right:
+			info.setString(L'→');
+			break;
+		case Up:
+			info.setString(L'↑');
+			break;
+		case Down:
+			info.setString(L'↓');
+			break;
+		case Trail:
+			info.setString(L'○');
+			break;
+		case ReadFromFile:
+			info.setString("Read from file");
+			break;
+		case SaveToFile:
+			info.setString("Save to file");
+			break;
+		case Add:
+			info.setString("Add");
+			break;
+		case Delete:
+			info.setString("Delete");
+			break;
+		case Next:
+			info.setString("Next");
+			break;
+		case Prev:
+			info.setString("Prev");
+			break;
+		case SelectColor:
+			info.setString("Color");
+			break;
+		case SelectScale:
+			info.setString("Scale");
+			break;
+		case Hide_Show:
+			info.setString("Hide/Show");
+			break;
+		case circ:
+			info.setString("Circle");
+			break;
+		case rect:
+			info.setString("Rectangle");
+			break;
+		case triang:
+			info.setString("Triangle");
+			break;
+		case unit:
+			info.setString("Unit shape");
+			break;
+		default:
+			break;
 	}
 
 	sf::FloatRect area = info.getLocalBounds();
@@ -184,25 +165,21 @@ void Button::Draw()
 //                                        TextBox
 //----------------------------------------------------------------------------------------------------
 
-void TextBox::Draw()
-{
+void TextBox::Draw() {
 	sf::Color col = _color;
 
-	if (_state == State::Focused)
-	{
+	if (_state == State::Focused) {
 		col.r = abs((col.r + 30) % 256);
 		col.g = abs((col.g + 30) % 256);
 		col.b = abs((col.b + 30) % 256);
 	}
-	else if (_state == State::Active)
-	{
+	else if (_state == State::Active) {
 		col.r = abs((col.r - 30) % 256);
 		col.g = abs((col.g - 30) % 256);
 		col.b = abs((col.b - 30) % 256);
 	}
 
-	if (!_rounding)
-	{
+	if (!_rounding) {
 		sf::RectangleShape rect;
 
 		rect.setFillColor(col);
@@ -213,8 +190,7 @@ void TextBox::Draw()
 
 		_window->draw(rect);
 	}
-	else
-	{
+	else {
 		RoundedRectangleShape rect;
 
 		rect.setCornersRadius(4);
@@ -233,47 +209,35 @@ void TextBox::Draw()
 //                                        Panel
 //----------------------------------------------------------------------------------------------------
 
-bool Panel::OnPanel(Form& form)
-{
+bool Panel::OnPanel(Form& form) {
 	if (form.GetPosition()._x >= this->GetPosition()._x && form.GetPosition()._y >= this->GetPosition()._y &&
-		form.GetPosition()._x + form.GetWidth() <= this->GetPosition()._x + this->GetWidth() && form.GetPosition()._y + form.GetHeight() <= this->GetPosition()._y + this->GetHeight())
-	{
+		form.GetPosition()._x + form.GetWidth() <= this->GetPosition()._x + this->GetWidth() && form.GetPosition()._y + form.GetHeight() <= this->GetPosition()._y + this->GetHeight()) {
 		return true;
 	}
 	else return false;
 }
 
-bool Panel::CheckOverlay(Form& form)
-{
-	for (auto a : _elem)
-	{
-		if (*a == form)
-		{
+bool Panel::CheckOverlay(Form& form) {
+	for (auto a : _elem) {
+		if (*a == form) {
 			return false;
 		}
 	}
-
 	return true;
 }
 
-void Panel::Add(Form& form)
-{
-	if(this->CheckOverlay(form) && this->OnPanel(form))
-	{ 
+void Panel::Add(Form& form) {
+	if(this->CheckOverlay(form) && this->OnPanel(form)) { 
 		Form* temp = form.Clone();
-
 		_elem.push_back(temp);
 	}
-	else
-	{
+	else {
 		throw "Incorrect position";
 	}
 }
 
-void Panel::Draw()
-{
-	if (!_rounding)
-	{
+void Panel::Draw() {
+	if (!_rounding) {
 		sf::RectangleShape rect;
 
 		rect.setSize(sf::Vector2f(_size._x, _size._y));
@@ -286,8 +250,7 @@ void Panel::Draw()
 
 		_window->draw(rect);
 	}
-	else
-	{
+	else {
 		RoundedRectangleShape rect;
 
 		rect.setCornersRadius(4);
@@ -301,8 +264,7 @@ void Panel::Draw()
 		_window->draw(rect);
 	}
 
-	for (auto a : _elem)
-	{
+	for (auto a : _elem) {
 		a->Draw();
 	}
 }

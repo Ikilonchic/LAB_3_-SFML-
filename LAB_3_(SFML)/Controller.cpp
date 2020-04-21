@@ -6,8 +6,7 @@
 //                                        Main window
 //----------------------------------------------------------------------------------------------------
 
-void Controller::InitApp()
-{
+void Controller::InitApp() {
     //ShowWindow(GetConsoleWindow(), SW_SHOW);
     srand(time(NULL));
 
@@ -44,94 +43,79 @@ void Controller::InitApp()
     FIGURES.push_back(new Circle(window, { 400, 300 }, { 50 }, sf::Color(10, 10, 10)));
 
     // Window running... //
-    while (window->isOpen())
-    {
+    while (window->isOpen()) {
         // Drawing interface... //
         inter.Draw();
 
-        while (window->pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::MouseMoved:
-            {
-                cursor = sf::Mouse::getPosition(*window);
+        while (window->pollEvent(event)) {
+            switch (event.type) {
+                case sf::Event::MouseMoved: {
+                    cursor = sf::Mouse::getPosition(*window);
 
-                if (!mouse_pressed)
-                {
+                    if (!mouse_pressed) {
+                        focus = inter.CheckFocused(cursor.x, cursor.y);
+                        inter.DrawFocus(focus);
+                    }
+
+                    break;
+                }
+                case sf::Event::MouseButtonPressed: {
+                    if(event.mouseButton.button == sf::Mouse::Left && focus != nullptr) {
+                        focus->SetState(State::Active);
+                        focus->Draw();
+
+                        mouse_pressed_on_button = true;
+                    }
+
+                    mouse_pressed = true;
+                    break;
+                }
+                case sf::Event::MouseButtonReleased: {
+                    if (mouse_pressed_on_button) {
+                        ShortAction(fac, dynamic_cast<Button*>(focus)->GetToken());
+                    }
+
                     focus = inter.CheckFocused(cursor.x, cursor.y);
                     inter.DrawFocus(focus);
+
+                    mouse_pressed_on_button = false;
+                    mouse_pressed = false;
+                    break;
                 }
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            {
-                if(event.mouseButton.button == sf::Mouse::Left && focus != nullptr)
-                {
-                    focus->SetState(State::Active);
-                    focus->Draw();
-
-                    mouse_pressed_on_button = true;
-                }
-
-                mouse_pressed = true;
-                break;
-            }
-            case sf::Event::MouseButtonReleased:
-            {
-                if (mouse_pressed_on_button)
-                {
-                    ShortAction(fac, dynamic_cast<Button*>(focus)->GetToken());
-                }
-
-                focus = inter.CheckFocused(cursor.x, cursor.y);
-                inter.DrawFocus(focus);
-
-                mouse_pressed_on_button = false;
-                mouse_pressed = false;
-                break;
-            }
-            case sf::Event::Closed:
-            {
-                window->close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
+                case sf::Event::Closed: {
                     window->close();
+                    break;
                 }
-                else if (event.key.code == sf::Keyboard::Enter)
-                {
-                    if (!UNIT_FIGURES.empty()) {
-                        FIGURES.push_back(new UnitShape(MAIN_WINDOW, UNIT_FIGURES));
-                        INDEX = FIGURES.size() - 1;
+                case sf::Event::KeyPressed: {
+                    if (event.key.code == sf::Keyboard::Escape) {
+                        window->close();
+                    }
+                    else if (event.key.code == sf::Keyboard::Enter) {
+                        if (!UNIT_FIGURES.empty()) {
+                            FIGURES.push_back(new UnitShape(MAIN_WINDOW, UNIT_FIGURES));
+                            INDEX = FIGURES.size() - 1;
+                        }
+
+                        UNIT_FIGURES.clear();
+                        UNIT_INDEX = 0;
+                        MODE = WINDOW_MODE::Standard;
+                    }
+                    else if (event.key.code == sf::Keyboard::Space) {
+                        if (MODE == WINDOW_MODE::ShapeSelection && UNIT_INDEX != INDEX) {
+                            UNIT_FIGURES.push_back(FIGURES[INDEX]->Clone());
+                        }
                     }
 
-                    UNIT_FIGURES.clear();
-                    UNIT_INDEX = 0;
-                    MODE = WINDOW_MODE::Standard;
+                    break;
                 }
-                else if (event.key.code == sf::Keyboard::Space)
-                {
-                    if (MODE == WINDOW_MODE::ShapeSelection && UNIT_INDEX != INDEX) {
-                        UNIT_FIGURES.push_back(FIGURES[INDEX]->Clone());
-                    }
-                }
-
-                break;
-            }
-            default:
-                break;
+                default:
+                    break;
             }
 
             timer.restart();
         }
 
-        if (mouse_pressed_on_button && focus != nullptr)
-        {
+        if (mouse_pressed_on_button && focus != nullptr) {
             LongAction(dynamic_cast<Button*>(focus)->GetToken());
         }
 
@@ -155,8 +139,7 @@ void Controller::InitApp()
 //                                        Set interface
 //----------------------------------------------------------------------------------------------------
 
-void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interface& inter)
-{
+void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interface& inter) {
     sf::RectangleShape background;
 
     background.setSize(sf::Vector2f(SC_WIDTH, SC_HEIGHT));
@@ -212,26 +195,20 @@ void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interfac
 //                                        Draw figures
 //----------------------------------------------------------------------------------------------------
 
-void Controller::DrawFigures(WINDOW_MODE mode)
-{
-    if (mode == WINDOW_MODE::Standby)
-    {
-        for (auto shape : FIGURES)
-        {
+void Controller::DrawFigures(WINDOW_MODE mode) {
+    if (mode == WINDOW_MODE::Standby) {
+        for (auto shape : FIGURES) {
             if (shape->GetMove() == Position(0, 0)) {
                 shape->SetMove(Position(rand() % 3, rand() % 3));
             }
         }
 
-        for (auto figure : FIGURES)
-        {
+        for (auto figure : FIGURES) {
             figure->Draw();
         }
     }
-    else
-    {
-        for (auto shape : FIGURES)
-        {
+    else {
+        for (auto shape : FIGURES) {
             shape->SetMove({0, 0});
         }
 
@@ -239,42 +216,33 @@ void Controller::DrawFigures(WINDOW_MODE mode)
             CheckCollision(INDEX);
         }
 
-        if (COLLIDING_FIGURES.size() == 0)
-        {
-            for (auto figure : FIGURES)
-            {
+        if (COLLIDING_FIGURES.size() == 0) {
+            for (auto figure : FIGURES) {
                 figure->Draw();
             }
 
-            if (FIGURES.size() != 0)
-            {
+            if (FIGURES.size() != 0) {
                 FIGURES[INDEX]->Draw();
             }
         }
-        else
-        {
-            for (auto figure : FIGURES)
-            {
+        else {
+            for (auto figure : FIGURES) {
                 bool flag = true;
 
-                for (auto colliding_figure : COLLIDING_FIGURES)
-                {
-                    if (figure == colliding_figure)
-                    {
+                for (auto colliding_figure : COLLIDING_FIGURES) {
+                    if (figure == colliding_figure) {
                         flag = false; break;
                     }
                 }
 
-                if (figure != FIGURES[INDEX] && flag)
-                {
+                if (figure != FIGURES[INDEX] && flag) {
                     figure->Draw();
                 }
             }
 
             sf::Color temp;
 
-            for (auto figure : COLLIDING_FIGURES)
-            {
+            for (auto figure : COLLIDING_FIGURES) {
                 temp = figure->GetColor();
                 figure->SetColor(collision_color);
 
@@ -297,68 +265,59 @@ void Controller::DrawFigures(WINDOW_MODE mode)
 //                                        Long action
 //----------------------------------------------------------------------------------------------------
 
-void Controller::LongAction(Token token)
-{
-    if (FIGURES.size() != 0)
-    {
-        switch (token)
-        {
-        case Token::Up:
-        {
-            FIGURES[INDEX]->Move(MOVE_UP);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
-                FIGURES[INDEX]->Move(MOVE_DOWN);
-            }
-
-            break;
-        }
-        case Token::Left:
-        {
-            FIGURES[INDEX]->Move(MOVE_LEFT);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
-                FIGURES[INDEX]->Move(MOVE_RIGHT);
-            }
-
-            break;
-        }
-        case Token::Right:
-        {
-            FIGURES[INDEX]->Move(MOVE_RIGHT);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
-                FIGURES[INDEX]->Move(MOVE_LEFT);
-            }
-
-            break;
-        }
-        case Token::Down:
-        {
-            FIGURES[INDEX]->Move(MOVE_DOWN);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
+void Controller::LongAction(Token token) {
+    if (FIGURES.size() != 0) {
+        switch (token) {
+            case Token::Up: {
                 FIGURES[INDEX]->Move(MOVE_UP);
-            }
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Move(MOVE_DOWN);
+                }
 
-            break;
-        }
-        case Token::RotateLeft:
-        {
-            FIGURES[INDEX]->Rotate(ROTATE_LEFT);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
-                FIGURES[INDEX]->Rotate(ROTATE_RIGHT);
+                break;
             }
+            case Token::Left: {
+                FIGURES[INDEX]->Move(MOVE_LEFT);
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Move(MOVE_RIGHT);
+                }
 
-            break;
-        }
-        case Token::RotateRight:
-        {
-            FIGURES[INDEX]->Rotate(ROTATE_RIGHT);
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
+                break;
+            }
+            case Token::Right: {
+                FIGURES[INDEX]->Move(MOVE_RIGHT);
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Move(MOVE_LEFT);
+                }
+
+                break;
+            }
+            case Token::Down: {
+                FIGURES[INDEX]->Move(MOVE_DOWN);
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Move(MOVE_UP);
+                }
+
+                break;
+            }
+            case Token::RotateLeft: {
                 FIGURES[INDEX]->Rotate(ROTATE_LEFT);
-            }
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Rotate(ROTATE_RIGHT);
+                }
 
-            break;
-        }
-        default:
-            break;
+                break;
+            }
+            case Token::RotateRight: {
+                FIGURES[INDEX]->Rotate(ROTATE_RIGHT);
+                if (FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) != SIDE::NONE_SIDE) {
+                    FIGURES[INDEX]->Rotate(ROTATE_LEFT);
+                }
+
+                break;
+            }
+            default:
+                break;
         }
     }
 }
@@ -367,161 +326,133 @@ void Controller::LongAction(Token token)
 //                                        Short action
 //----------------------------------------------------------------------------------------------------
 
-void Controller::ShortAction(Factory* fac, Token token)
-{
-    switch (token)
-    {
-    case Token::ReadFromFile:
-    {
-        std::string file = Dialog::OpenFileDialog();
+void Controller::ShortAction(Factory* fac, Token token) {
+    switch (token) {
+        case Token::ReadFromFile: {
+            std::string file = Dialog::OpenFileDialog();
 
-        if (file != std::string()) {
-            FIGURES = InfoManager::ReadFromFile(file);
+            if (file != std::string()) {
+                FIGURES = InfoManager::ReadFromFile(file);
+            }
+
+            for (auto a : FIGURES) {
+                a->SetWindow(MAIN_WINDOW);
+            }
+
+            break;
         }
+        case Token::SaveToFile: {
+            std::string file = Dialog::OpenFileDialog();
+            InfoManager::SaveToFile(file, FIGURES);
 
-        for (auto a : FIGURES) {
-            a->SetWindow(MAIN_WINDOW);
+            break;
         }
+        case Token::Trail: {
+            if (FIGURES.size() != 0) {
+                FIGURES[INDEX]->SetTail(FIGURES[INDEX]->GetTail() ? false : true);
+            }
 
-        break;
-    }
-    case Token::SaveToFile:
-    {
-        std::string file = Dialog::OpenFileDialog();
-        InfoManager::SaveToFile(file, FIGURES);
-
-        break;
-    }
-    case Token::Trail:
-    {
-        if (FIGURES.size() != 0)
-        {
-            FIGURES[INDEX]->SetTail(FIGURES[INDEX]->GetTail() ? false : true);
+            break;
         }
+        case Token::Delete: {
+            if (FIGURES.size() != 0) {
+                std::vector<Shape*> temp;
 
-        break;
-    }
-    case Token::Delete:
-    {
-        if (FIGURES.size() != 0)
-        {
-            std::vector<Shape*> temp;
+                for (auto a : FIGURES) {
+                    if (a != FIGURES[INDEX]) {
+                        temp.push_back(a);
+                    }
+                }
 
-            for (auto a : FIGURES)
-            {
-                if (a != FIGURES[INDEX])
-                {
-                    temp.push_back(a);
+                FIGURES = temp;
+
+                if (INDEX != 0) {
+                    INDEX--;
                 }
             }
 
-            FIGURES = temp;
-
-            if (INDEX != 0)
-            {
-                INDEX--;
-            }
+            break;
         }
+        case Token::Add: {
+            Shape* shape = Dialog::OpenFiguresDialog(fac);
 
-        break;
-    }
-    case Token::Add:
-    {
-        Shape* shape = Dialog::OpenFiguresDialog(fac);
+            if (shape != nullptr) {
+                if (shape->GetName() == "unit") {
+                    MODE = WINDOW_MODE::ShapeSelection;
+                    UNIT_INDEX = FIGURES.size();
+                }
+                else {
+                    FIGURES.push_back(shape);
+                    INDEX = FIGURES.size() - 1;
+                }
+            }
 
-        if (shape != nullptr)
-        {
-            if (shape->GetName() == "unit") {
-                MODE = WINDOW_MODE::ShapeSelection;
-                UNIT_INDEX = FIGURES.size();
-            }
-            else
-            {
-                FIGURES.push_back(shape);
-                INDEX = FIGURES.size() - 1;
-            }
+            break;
         }
+        case Token::Prev: {
+            if (FIGURES.size() != 0) {
+                FIGURES[INDEX]->SetOutlineThickness(false);
 
-        break;
-    }
-    case Token::Prev:
-    {
-        if (FIGURES.size() != 0)
-        {
-            FIGURES[INDEX]->SetOutlineThickness(false);
+                if (FIGURES.size() > 1) {
+                    INDEX = abs(INDEX - 1) % FIGURES.size();
+                }
 
-            if (FIGURES.size() > 1)
-            {
-                INDEX = abs(INDEX - 1) % FIGURES.size();
+                if (!FIGURES[INDEX]->GetVisible()) {
+                    FIGURES[INDEX]->SetOutlineThickness(true);
+                }
             }
 
-            if (!FIGURES[INDEX]->GetVisible())
-            {
-                FIGURES[INDEX]->SetOutlineThickness(true);
-            }
+            break;
         }
+        case Token::Next: {
+            if (FIGURES.size() != 0) {
+                FIGURES[INDEX]->SetOutlineThickness(false);
 
-        break;
-    }
-    case Token::Next:
-    {
-        if (FIGURES.size() != 0)
-        {
-            FIGURES[INDEX]->SetOutlineThickness(false);
+                if (FIGURES.size() > 1) {
+                    INDEX = abs(INDEX + 1) % FIGURES.size();
+                }
 
-            if (FIGURES.size() > 1)
-            {
-                INDEX = abs(INDEX + 1) % FIGURES.size();
+                if (!FIGURES[INDEX]->GetVisible()) {
+                    FIGURES[INDEX]->SetOutlineThickness(true);
+                }
             }
 
-            if (!FIGURES[INDEX]->GetVisible())
-            {
-                FIGURES[INDEX]->SetOutlineThickness(true);
+            break;
+        }
+        case Token::Hide_Show: {
+            if (FIGURES.size() != 0) {
+                FIGURES[INDEX]->SetVisible(FIGURES[INDEX]->GetVisible() ? false : true);
+                FIGURES[INDEX]->SetOutlineThickness(FIGURES[INDEX]->GetVisible() ? false : true);
             }
+
+            break;
         }
+        case Token::SelectColor: {
+            if (FIGURES.size() != 0) {
+                sf::Color color = Dialog::OpenColorDialog();
 
-        break;
-    }
-    case Token::Hide_Show:
-    {
-        if (FIGURES.size() != 0)
-        {
-            FIGURES[INDEX]->SetVisible(FIGURES[INDEX]->GetVisible() ? false : true);
-            FIGURES[INDEX]->SetOutlineThickness(FIGURES[INDEX]->GetVisible() ? false : true);
-        }
-
-        break;
-    }
-    case Token::SelectColor:
-    {
-        if (FIGURES.size() != 0)
-        {
-            sf::Color color = Dialog::OpenColorDialog();
-
-            if (color.a != 0) {
-                FIGURES[INDEX]->SetColor(color);
+                if (color.a != 0) {
+                    FIGURES[INDEX]->SetColor(color);
+                }
             }
+
+            break;
         }
+        case Token::SelectScale: {
+            if (FIGURES.size() != 0) {
+                Position scale = Dialog::OpenScaleDialog();
+                Position temp = FIGURES[INDEX]->GetScale();
+                FIGURES[INDEX]->SetScale(scale);
 
-        break;
-    }
-    case Token::SelectScale:
-    {
-        if (FIGURES.size() != 0)
-        {
-            Position scale = Dialog::OpenScaleDialog();
-            Position temp = FIGURES[INDEX]->GetScale();
-            FIGURES[INDEX]->SetScale(scale);
-
-            if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
-                FIGURES[INDEX]->SetScale(temp);
+                if (!(FIGURES[INDEX]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE)) {
+                    FIGURES[INDEX]->SetScale(temp);
+                }
             }
-        }
 
-        break;
-    }
-    default:
-        break;
+            break;
+        }
+        default:
+            break;
     }
 }
 
@@ -529,20 +460,16 @@ void Controller::ShortAction(Factory* fac, Token token)
 //                                        Check collision
 //----------------------------------------------------------------------------------------------------
 
-void Controller::CheckCollision(int INDEX)
-{
+void Controller::CheckCollision(int INDEX) {
     COLLIDING_FIGURES = std::vector<Shape*>();
 
-    if (FIGURES[INDEX]->GetVisible())
-    {
+    if (FIGURES[INDEX]->GetVisible()) {
         int r = 0, g = 0, b = 0;
 
         bool flag = false;
 
-        for (auto a : FIGURES)
-        {
-            if (a != FIGURES[INDEX] && Shape::CheckÑollision(FIGURES[INDEX], a) && a->GetVisible())
-            {
+        for (auto a : FIGURES) {
+            if (a != FIGURES[INDEX] && Shape::CheckÑollision(FIGURES[INDEX], a) && a->GetVisible()) {
                 COLLIDING_FIGURES.push_back(a);
 
                 r += a->GetColor().r;
@@ -553,8 +480,7 @@ void Controller::CheckCollision(int INDEX)
             }
         }
 
-        if (flag)
-        {
+        if (flag) {
             r += FIGURES[INDEX]->GetColor().r;
             g += FIGURES[INDEX]->GetColor().g;
             b += FIGURES[INDEX]->GetColor().b;

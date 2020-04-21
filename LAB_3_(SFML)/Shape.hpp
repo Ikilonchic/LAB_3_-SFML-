@@ -42,6 +42,7 @@ protected:
 	// Private methods //
 	virtual void Update() = 0;
 	virtual Position GetPoint(const int index) = 0;
+	virtual void AutoMove();
 
 public:
 	// Ñonstructors //
@@ -84,7 +85,7 @@ public:
 	virtual void Rotate(const int angle) { _angle = (int)(_angle + angle + 360) % 360; Update(); }
 	virtual Shape* Clone() = 0;
 
-	virtual SIDE OnArea(const float xa, const float ya) = 0;
+	virtual SIDE OnArea(const float xa, const float ya);
 
 	static bool CheckÑollision(Shape* first, Shape* second);
 };
@@ -123,8 +124,6 @@ public:
 	// Methods //
 	virtual void Draw() override;
 	virtual Shape* Clone() override { return new Circle(*this); }
-
-	virtual SIDE OnArea(const float x, const float y) override;
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -161,8 +160,6 @@ public:
 	// Methods //
 	virtual void Draw() override;
 	virtual Shape* Clone() override { return new Rectangle(*this); }
-
-	virtual SIDE OnArea(const float x, const float y) override;
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -199,8 +196,6 @@ public:
 	// Methods //
 	virtual void Draw() override;
 	virtual Shape* Clone() override { return new Triangle(*this); }
-
-	virtual SIDE OnArea(const float x, const float y) override;
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -247,8 +242,6 @@ public:
 
 	virtual void Move(const float x, const float y) override { _pos._x += x, _pos._y += y; for (auto shape : _elem) { shape->Move(x, y); } };
 	virtual void Rotate(const int angle) override { _angle = (int)(_angle + angle + 360) % 360; for (auto shape : _elem) { shape->Rotate(angle); } }
-
-	virtual SIDE OnArea(const float x, const float y) override;
 };
 
 #endif
