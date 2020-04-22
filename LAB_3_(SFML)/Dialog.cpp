@@ -362,6 +362,7 @@ sf::Color Dialog::OpenColorDialog() {
                             index--;
                             info[index].pop_back();
                         }
+                        text[index].setString(info[index]);
                     }
                     else {
                         char symbol = InfoManager::InpFromKey(event.key.code);

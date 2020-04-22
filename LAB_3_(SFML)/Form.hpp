@@ -80,7 +80,7 @@ enum Token
 	ReadFromFile, SaveToFile,
 	Add, Delete,
 	Next, Prev,
-	SelectColor, SelectScale, Hide_Show,
+	SelectColor, SelectScale, Hide_Show, Clear,
 
 	//////////////////////////////
 

@@ -41,6 +41,7 @@ protected:
 
 	// Private methods //
 	virtual void Update() = 0;
+	virtual void UpdateTail() = 0;
 	virtual Position GetPoint(const int index) = 0;
 	virtual void AutoMove();
 
@@ -53,7 +54,7 @@ public:
 	virtual ~Shape() { _window = nullptr; }
 
 	// Getters //
-	virtual std::string GetName() { return _name; }
+	virtual std::string GetName() const { return _name; }
 	virtual size_t GetPointCount() const = 0;
 	virtual Position GetPosition() const { return _pos; }
 	virtual float GetAngle() const { return _angle; }
@@ -81,8 +82,33 @@ public:
 
 	// Methods //
 	virtual void Draw() = 0;
-	virtual void Move(const float x, const float y) { _pos._x += x, _pos._y += y; Update(); };
-	virtual void Rotate(const int angle) { _angle = (int)(_angle + angle + 360) % 360; Update(); }
+	virtual void Move(const float x, const float y) {
+		_pos._x += x, _pos._y += y;
+
+		if (OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE && _tail) {
+			_pos._x -= x, _pos._y -= y;
+
+			UpdateTail();
+
+			_pos._x += x, _pos._y += y;
+		}
+
+		Update();
+	};
+
+	virtual void Rotate(const int angle) { 
+		_angle = (int)(_angle + angle + 360) % 360;
+
+		if (OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE && _tail) {
+			_angle = (int)(_angle - angle + 360) % 360;
+
+			UpdateTail();
+
+			_angle = (int)(_angle + angle + 360) % 360;
+		}
+
+		Update();
+	}
 	virtual Shape* Clone() = 0;
 
 	virtual SIDE OnArea(const float xa, const float ya);
@@ -100,10 +126,11 @@ protected:
 	// SFML shape //
 	sf::CircleShape _shape;
 	// Tail //
-	std::vector<sf::CircleShape> _tail;
+	std::vector<sf::CircleShape> _vtail;
 	
 	// Private methods //
 	virtual void Update() override;
+	virtual void UpdateTail() override;
 	virtual Position GetPoint(const int index) override;
 
 public:
@@ -120,6 +147,7 @@ public:
 
 	// Setters //
 	void SetSize(const Position size) override { _size._x = size._x; Update(); }
+	virtual void SetTail(bool what) { _tail = what; if (!_tail) { _vtail.clear(); } Update(); }
 	
 	// Methods //
 	virtual void Draw() override;
@@ -136,16 +164,17 @@ protected:
 	// SFML shape //
 	sf::RectangleShape _shape;
 	// Tail //
-	std::vector<sf::RectangleShape> _tail;
+	std::vector<sf::RectangleShape> _vtail;
 	 
 	// Private methods //
 	virtual void Update() override;
+	virtual void UpdateTail() override;
 	virtual Position GetPoint(const int index) override;
 
 public:
 	// Constructors //
 	explicit Rectangle() : Shape() { Update(); _name = "rect"; _size = { 0, 0 }; }
-	explicit Rectangle(std::shared_ptr<sf::RenderWindow> window, Position pos = { 0, 0 }, Position size = { 0, 0 }, const sf::Color color = sf::Color(), const float angle = 0, Position scale = { 1, 1 }) : Shape(window, pos, color, angle, scale) { Update(); _name = "rect"; _size = { size._x, size._y }; }
+	explicit Rectangle(std::shared_ptr<sf::RenderWindow> window, Position pos = { 0, 0 }, Position size = { 0, 0 }, const sf::Color color = sf::Color(), const float angle = 0, Position scale = { 1, 1 }) : Shape(window, pos, color, angle, scale) { _name = "rect"; _size = { size._x, size._y }; Update(); }
 	explicit Rectangle(const Rectangle& temp) : Shape(temp._window, temp._pos, temp._color, temp._angle, temp._scale) { _name = "rect"; _size = { temp._size._x, temp._size._y }; Update(); }
 
 	// Destructors //
@@ -156,6 +185,7 @@ public:
 
 	// Setters //
 	void SetSize(const Position size) override { _size = {size._x, size._y}; Update(); }
+	virtual void SetTail(bool what) { _tail = what; if (!_tail) { _vtail.clear(); } Update(); }
 
 	// Methods //
 	virtual void Draw() override;
@@ -172,16 +202,17 @@ protected:
 	// SFML shape //
 	sf::CircleShape _shape;
 	// Tail //
-	std::vector<sf::CircleShape> _tail;
+	std::vector<sf::CircleShape> _vtail;
 
 	// Private methods //
 	virtual void Update() override;
+	virtual void UpdateTail() override;
 	virtual Position GetPoint(const int index) override;
 
 public:
 	// Constructors //
 	explicit Triangle() : Shape() { Update(); _name = "tria"; _size = { 0, 0 }; }
-	explicit Triangle(std::shared_ptr<sf::RenderWindow> window, Position pos = { 0, 0 }, const float radius = 0, const sf::Color color = sf::Color(), const float angle = 0, Position scale = { 1, 1 }) : Shape(window, pos, color, angle, scale) { Update(); _name = "tria"; _size = { radius, 0 }; }
+	explicit Triangle(std::shared_ptr<sf::RenderWindow> window, Position pos = { 0, 0 }, const float radius = 0, const sf::Color color = sf::Color(), const float angle = 0, Position scale = { 1, 1 }) : Shape(window, pos, color, angle, scale) { _name = "tria"; _size = { radius, 0 }; Update(); }
 	explicit Triangle(const Triangle& temp) : Shape(temp._window, temp._pos, temp._color, temp._angle, temp._scale) { _name = "tria"; _size._x = temp._size._x; Update(); }
 
 	// Destructors //
@@ -192,6 +223,7 @@ public:
 
 	// Setters //
 	void SetSize(const Position size) override { _size._x = size._x; Update(); }
+	virtual void SetTail(bool what) { _tail = what; if (!_tail) { _vtail.clear(); } Update(); }
 
 	// Methods //
 	virtual void Draw() override;
@@ -210,6 +242,7 @@ protected:
 
 	// Private methods //
 	virtual void Update() override;
+	virtual void UpdateTail() override;
 	virtual Position GetPoint(const int index) override;
 
 public:

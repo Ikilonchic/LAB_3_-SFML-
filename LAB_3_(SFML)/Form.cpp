@@ -138,6 +138,9 @@ void Button::Draw() {
 		case Hide_Show:
 			info.setString("Hide/Show");
 			break;
+		case Clear:
+			info.setString("Clear");
+			break;
 		case circ:
 			info.setString("Circle");
 			break;

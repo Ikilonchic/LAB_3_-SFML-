@@ -37,11 +37,6 @@ void Controller::InitApp() {
     // Shape factory //
     Factory* fac = new Factory(window);
 
-    // Test //
-    FIGURES.push_back(new Rectangle(window, { 28, 28 }, { 50, 50 }, sf::Color(155, 155, 200)));
-    FIGURES.push_back(new Rectangle(window, { 300, 300 }, { 50, 50 }, sf::Color(50, 50, 50)));
-    FIGURES.push_back(new Circle(window, { 400, 300 }, { 50 }, sf::Color(10, 10, 10)));
-
     // Window running... //
     while (window->isOpen()) {
         // Drawing interface... //
@@ -117,6 +112,7 @@ void Controller::InitApp() {
 
         if (mouse_pressed_on_button && focus != nullptr) {
             LongAction(dynamic_cast<Button*>(focus)->GetToken());
+            timer.restart();
         }
 
         // Timer check... //
@@ -163,9 +159,10 @@ void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interfac
     Button but11(window, Token::Add, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 454 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
     Button but12(window, Token::Prev, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
     Button but13(window, Token::Next, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 519 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    Button but14(window, Token::Hide_Show, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 584 * DIFFERENCE }, BIG_BUT, BUTTOM_COLOR, State::Inactive, true);
-    Button but15(window, Token::SelectColor, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
-    Button but16(window, Token::SelectScale, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but14(window, Token::Hide_Show, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 584 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but15(window, Token::Clear, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 584 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but16(window, Token::SelectColor, { SC_WIDTH / 4 * 3 + 28 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
+    Button but17(window, Token::SelectScale, { SC_WIDTH / 4 * 3 + 168 * DIFFERENCE, 649 * DIFFERENCE }, STANDARD_BUT, BUTTOM_COLOR, State::Inactive, true);
 
     temp.Add(but1);
     temp.Add(but2);
@@ -185,6 +182,7 @@ void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interfac
     temp.Add(but14);
     temp.Add(but15);
     temp.Add(but16);
+    temp.Add(but17);
 
     inter.SetWindow(window);
     inter.SetBackground(background);
@@ -331,6 +329,8 @@ void Controller::ShortAction(Factory* fac, Token token) {
         case Token::ReadFromFile: {
             std::string file = Dialog::OpenFileDialog();
 
+            std::cout << file << std::endl;
+
             if (file != std::string()) {
                 FIGURES = InfoManager::ReadFromFile(file);
             }
@@ -425,6 +425,11 @@ void Controller::ShortAction(Factory* fac, Token token) {
                 FIGURES[INDEX]->SetOutlineThickness(FIGURES[INDEX]->GetVisible() ? false : true);
             }
 
+            break;
+        }
+        case Token::Clear:
+        {
+            FIGURES.clear();
             break;
         }
         case Token::SelectColor: {

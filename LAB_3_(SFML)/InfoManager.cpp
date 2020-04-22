@@ -221,10 +221,10 @@ std::vector<Shape*> InfoManager::ReadFromFile(std::string name_f) {
 			continue;
 		}
 		else if (line[0] == '+') {
-			if (unit.size() == 1 && unit[0]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) {
+			if (unit.size() == 1 && unit[0]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE) {
 				figures.push_back(unit[0]);
 			}
-			else if (unit.size() > 1 && UnitShape(std::shared_ptr<sf::RenderWindow>(), unit).OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT)) {
+			else if (unit.size() > 1 && UnitShape(std::shared_ptr<sf::RenderWindow>(), unit).OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE) {
 				figures.push_back(new UnitShape(std::shared_ptr<sf::RenderWindow>(), unit));
 			}
 

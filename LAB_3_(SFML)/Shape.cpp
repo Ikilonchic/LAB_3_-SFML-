@@ -117,12 +117,21 @@ void Circle::Update() {
 	circ.setRadius(_size._x);
 	circ.setOrigin(_size._x, _size._x);
 	circ.setPosition(sf::Vector2f(_pos._x, _pos._y));
+	circ.rotate(_angle);
 
 	sf::Vector2f scale = circ.getScale();
 
 	circ.scale(scale.x * _scale._x, scale.y * _scale._y);
 
 	_shape = circ;
+}
+
+void Circle::UpdateTail() {
+	_vtail.push_back(_shape);
+
+	if (_vtail.size() > TAIL_SIZE) {
+		_vtail.erase(_vtail.begin());
+	}
 }
 
 Position Circle::GetPoint(const int index) {
@@ -153,6 +162,11 @@ Position Circle::GetPoint(const int index) {
 
 void Circle::Draw() {
 	AutoMove();
+
+	for (auto tail : _vtail) {
+		_window->draw(tail);
+	}
+
 	_window->draw(_shape);
 }
 
@@ -180,6 +194,14 @@ void Rectangle::Update() {
 	rect.scale(scale.x * _scale._x, scale.y * _scale._y);
 
 	_shape = rect;
+}
+
+void Rectangle::UpdateTail() {
+	_vtail.push_back(_shape);
+
+	if (_vtail.size() > TAIL_SIZE) {
+		_vtail.erase(_vtail.begin());
+	}
 }
 
 Position Rectangle::GetPoint(const int index) {
@@ -210,6 +232,11 @@ Position Rectangle::GetPoint(const int index) {
 
 void Rectangle::Draw() {
 	AutoMove();
+
+	for (auto tail : _vtail) {
+		_window->draw(tail);
+	}
+
 	_window->draw(_shape);
 }
 
@@ -236,6 +263,14 @@ void Triangle::Update() {
 	triangle.scale(scale.x * _scale._x, scale.y * _scale._y);
 
 	_shape = triangle;
+}
+
+void Triangle::UpdateTail() {
+	_vtail.push_back(_shape);
+
+	if (_vtail.size() > TAIL_SIZE) {
+		_vtail.erase(_vtail.begin());
+	}
 }
 
 Position Triangle::GetPoint(const int index) {
@@ -266,6 +301,11 @@ Position Triangle::GetPoint(const int index) {
 
 void Triangle::Draw() {
 	AutoMove();
+
+	for (auto tail : _vtail) {
+		_window->draw(tail);
+	}
+
 	_window->draw(_shape);
 }
 
@@ -313,6 +353,12 @@ void UnitShape::Update() {
 		shape->_color = _color;
 
 		shape->Update();
+	}
+}
+
+void UnitShape::UpdateTail() {
+	for (auto shape : _elem) {
+		shape->UpdateTail();
 	}
 }
 

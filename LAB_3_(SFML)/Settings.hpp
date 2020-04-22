@@ -84,4 +84,6 @@ enum WINDOW_MODE {
 #define ROTATE_LEFT -2
 #define ROTATE_RIGHT 2
 
+#define TAIL_SIZE 30
+
 #endif
