@@ -394,7 +394,7 @@ void Controller::ShortAction(Factory* fac, Token token) {
                 FIGURES[INDEX]->SetOutlineThickness(false);
 
                 if (FIGURES.size() > 1) {
-                    INDEX = abs(INDEX - 1) % FIGURES.size();
+                    INDEX = (FIGURES.size() + INDEX - 1) % FIGURES.size();
                 }
 
                 if (!FIGURES[INDEX]->GetVisible()) {

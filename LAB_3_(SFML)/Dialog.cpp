@@ -555,7 +555,6 @@ Position Dialog::OpenScaleDialog() {
                         if (info[index].size() > 4 && index == 1) {
                             info[index].pop_back();
                         }
-
                         text[index].setString(info[index]);
                     }
 
