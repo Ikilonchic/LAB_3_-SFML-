@@ -35,7 +35,7 @@ void Controller::InitApp() {
     SetInterface(window, inter);
 
     // Shape factory //
-    Factory* fac = new Factory(window);
+    std::unique_ptr<Factory> fac = std::make_unique<Factory>(window);
 
     // Window running... //
     while (window->isOpen()) {
@@ -87,7 +87,7 @@ void Controller::InitApp() {
                     }
                     else if (event.key.code == sf::Keyboard::Enter) {
                         if (!UNIT_FIGURES.empty()) {
-                            FIGURES.push_back(new UnitShape(MAIN_WINDOW, UNIT_FIGURES));
+                            FIGURES.push_back(std::move(std::unique_ptr<Shape>(new UnitShape(MAIN_WINDOW, UNIT_FIGURES))));
                             INDEX = FIGURES.size() - 1;
                         }
 
@@ -97,7 +97,7 @@ void Controller::InitApp() {
                     }
                     else if (event.key.code == sf::Keyboard::Space) {
                         if (MODE == WINDOW_MODE::ShapeSelection && UNIT_INDEX != INDEX) {
-                            UNIT_FIGURES.push_back(FIGURES[INDEX]->Clone());
+                            UNIT_FIGURES.push_back(std::move(FIGURES[INDEX]->Clone()));
                         }
                     }
 
@@ -195,18 +195,18 @@ void Controller::SetInterface(std::shared_ptr<sf::RenderWindow> window, Interfac
 
 void Controller::DrawFigures(WINDOW_MODE mode) {
     if (mode == WINDOW_MODE::Standby) {
-        for (auto shape : FIGURES) {
+        for (auto& shape : FIGURES) {
             if (shape->GetMove() == Position(0, 0)) {
                 shape->SetMove(Position(rand() % 3, rand() % 3));
             }
         }
 
-        for (auto figure : FIGURES) {
+        for (auto& figure : FIGURES) {
             figure->Draw();
         }
     }
     else {
-        for (auto shape : FIGURES) {
+        for (auto& shape : FIGURES) {
             shape->SetMove({0, 0});
         }
 
@@ -215,7 +215,7 @@ void Controller::DrawFigures(WINDOW_MODE mode) {
         }
 
         if (COLLIDING_FIGURES.size() == 0) {
-            for (auto figure : FIGURES) {
+            for (auto& figure : FIGURES) {
                 figure->Draw();
             }
 
@@ -224,10 +224,10 @@ void Controller::DrawFigures(WINDOW_MODE mode) {
             }
         }
         else {
-            for (auto figure : FIGURES) {
+            for (auto& figure : FIGURES) {
                 bool flag = true;
 
-                for (auto colliding_figure : COLLIDING_FIGURES) {
+                for (auto& colliding_figure : COLLIDING_FIGURES) {
                     if (figure == colliding_figure) {
                         flag = false; break;
                     }
@@ -240,7 +240,7 @@ void Controller::DrawFigures(WINDOW_MODE mode) {
 
             sf::Color temp;
 
-            for (auto figure : COLLIDING_FIGURES) {
+            for (auto& figure : COLLIDING_FIGURES) {
                 temp = figure->GetColor();
                 figure->SetColor(collision_color);
 
@@ -324,7 +324,7 @@ void Controller::LongAction(Token token) {
 //                                        Short action
 //----------------------------------------------------------------------------------------------------
 
-void Controller::ShortAction(Factory* fac, Token token) {
+void Controller::ShortAction(std::unique_ptr<Factory>& fac, Token token) {
     switch (token) {
         case Token::ReadFromFile: {
             std::string file = Dialog::OpenFileDialog();
@@ -335,7 +335,7 @@ void Controller::ShortAction(Factory* fac, Token token) {
                 FIGURES = InfoManager::ReadFromFile(file);
             }
 
-            for (auto a : FIGURES) {
+            for (auto& a : FIGURES) {
                 a->SetWindow(MAIN_WINDOW);
             }
 
@@ -356,11 +356,11 @@ void Controller::ShortAction(Factory* fac, Token token) {
         }
         case Token::Delete: {
             if (FIGURES.size() != 0) {
-                std::vector<Shape*> temp;
+                std::vector<std::unique_ptr<Shape>> temp;
 
-                for (auto a : FIGURES) {
-                    if (a != FIGURES[INDEX]) {
-                        temp.push_back(a);
+                for (auto& a : FIGURES) {
+                    if (a.get() != FIGURES[INDEX].get()) {
+                        temp.push_back(std::move(a));
                     }
                 }
 
@@ -374,15 +374,15 @@ void Controller::ShortAction(Factory* fac, Token token) {
             break;
         }
         case Token::Add: {
-            Shape* shape = Dialog::OpenFiguresDialog(fac);
+            std::unique_ptr<Shape> shape = std::move(Dialog::OpenFiguresDialog(fac));
 
-            if (shape != nullptr) {
+            if (shape.get() != std::unique_ptr<Shape>().get()) {
                 if (shape->GetName() == "unit") {
                     MODE = WINDOW_MODE::ShapeSelection;
                     UNIT_INDEX = FIGURES.size();
                 }
                 else {
-                    FIGURES.push_back(shape);
+                    FIGURES.push_back(std::move(shape));
                     INDEX = FIGURES.size() - 1;
                 }
             }
@@ -466,15 +466,15 @@ void Controller::ShortAction(Factory* fac, Token token) {
 //----------------------------------------------------------------------------------------------------
 
 void Controller::CheckCollision(int INDEX) {
-    COLLIDING_FIGURES = std::vector<Shape*>();
+    COLLIDING_FIGURES = std::vector<std::unique_ptr<Shape>>();
 
     if (FIGURES[INDEX]->GetVisible()) {
         int r = 0, g = 0, b = 0;
 
         bool flag = false;
 
-        for (auto a : FIGURES) {
-            if (a != FIGURES[INDEX] && Shape::CheckÑollision(FIGURES[INDEX], a) && a->GetVisible()) {
+        for (auto& a : FIGURES) {
+            if (a != FIGURES[INDEX] && Shape::CheckÑollision(std::move(FIGURES[INDEX]), std::move(a)) && a->GetVisible()) {
                 COLLIDING_FIGURES.push_back(a);
 
                 r += a->GetColor().r;

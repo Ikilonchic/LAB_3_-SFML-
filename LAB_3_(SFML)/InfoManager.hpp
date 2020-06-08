@@ -18,7 +18,7 @@ private:
 	static void InsToStr(std::string& line, std::string ins, int index = 0);
 
 	// Save shape to line //
-	static std::string SaveFigure(Shape* a);
+	static std::string SaveFigure(std::unique_ptr<Shape> a);
 
 public:
 	// Ñonversion to char //
@@ -35,8 +35,8 @@ public:
 	}
 
 	// Read and save to file //
-	static std::vector<Shape*> ReadFromFile(std::string name_f);
-	static void SaveToFile(std::string name_f, std::vector<Shape*> figures);
+	static std::vector<std::unique_ptr<Shape>> ReadFromFile(std::string name_f);
+	static void SaveToFile(std::string name_f, std::vector<std::unique_ptr<Shape>> figures);
 };
 
 #endif

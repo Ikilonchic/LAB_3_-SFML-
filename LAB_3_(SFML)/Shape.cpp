@@ -50,7 +50,7 @@ SIDE Shape::OnArea(const float xa, const float ya) {
 	return SIDE::NONE_SIDE;
 }
 
-bool Shape::Check—ollision(Shape* first, Shape* second) {
+bool Shape::Check—ollision(std::unique_ptr<Shape> first, std::unique_ptr<Shape> second) {
 	Position temp;
 
 	if (first->GetPosition()._x - second->GetPosition()._x < 0) {
@@ -319,18 +319,18 @@ void UnitShape::Update() {
 	_color = sf::Color();
 
 	// Shrink to fit //
-	std::vector<Shape*> temp;
+	std::vector<std::unique_ptr<Shape>> temp;
 
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		if (shape->_visible) {
-			temp.push_back(shape->Clone());
+			temp.push_back(std::move(shape->Clone()));
 		}
 	}
 
-	_elem = temp;
+	_elem = std::move(temp);
 
 	// New parameters //
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		_pos._x += shape->_pos._x;
 		_pos._y += shape->_pos._y;
 
@@ -346,7 +346,7 @@ void UnitShape::Update() {
 	_color.g /= _elem.size();
 	_color.b /= _elem.size();
 
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		shape->_window = _window;
 
 		shape->_pos = _pos;
@@ -357,7 +357,7 @@ void UnitShape::Update() {
 }
 
 void UnitShape::UpdateTail() {
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		shape->UpdateTail();
 	}
 }
@@ -388,7 +388,7 @@ Position UnitShape::GetPoint(const int index) {
 size_t UnitShape::GetPointCount() const {
 	size_t count = 0;
 
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		count += shape->GetPointCount();
 	}
 
@@ -401,7 +401,7 @@ void UnitShape::Draw() {
 	// Restoring position on the first element //
 	Position temp = _elem[0]->_pos;
 
-	for (auto shape : _elem) {
+	for (auto& shape : _elem) {
 		shape->SetPosition(temp);
 		shape->Draw();
 	}

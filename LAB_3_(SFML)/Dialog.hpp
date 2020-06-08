@@ -14,7 +14,7 @@ class Dialog final
 public:
 	// Methods //
 	static std::string OpenFileDialog();
-	static Shape* OpenFiguresDialog(Factory* fac);
+	static std::unique_ptr<Shape> OpenFiguresDialog(std::unique_ptr<Factory>& fac);
 	static sf::Color OpenColorDialog();
 	static Position OpenScaleDialog();
 };

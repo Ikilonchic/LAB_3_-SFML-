@@ -23,7 +23,7 @@ public:
 	~Factory() {}
 	
 	// Methods //
-	Shape* MakeShape(Token token, const Position pos = { (SC_WIDTH * 3 / 8), (SC_HEIGHT / 2) }, const sf::Color color = sf::Color(64, 64, 64), const float angle = 0, const Position scale = { 1, 1 });
+	std::unique_ptr<Shape> MakeShape(Token token, const Position pos = { (SC_WIDTH * 3 / 8), (SC_HEIGHT / 2) }, const sf::Color color = sf::Color(64, 64, 64), const float angle = 0, const Position scale = { 1, 1 });
 };
 
 #endif

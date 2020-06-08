@@ -109,11 +109,11 @@ public:
 
 		Update();
 	}
-	virtual Shape* Clone() = 0;
+	virtual std::unique_ptr<Shape> Clone() = 0;
 
 	virtual SIDE OnArea(const float xa, const float ya);
 
-	static bool Check—ollision(Shape* first, Shape* second);
+	static bool Check—ollision(std::unique_ptr<Shape> first, std::unique_ptr<Shape> second);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ public:
 	
 	// Methods //
 	virtual void Draw() override;
-	virtual Shape* Clone() override { return new Circle(*this); }
+	virtual std::unique_ptr<Shape> Clone() override { return std::unique_ptr<Shape>(new Circle(*this)); }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ public:
 
 	// Methods //
 	virtual void Draw() override;
-	virtual Shape* Clone() override { return new Rectangle(*this); }
+	virtual std::unique_ptr<Shape> Clone() override { return std::unique_ptr<Shape>(new Rectangle(*this)); }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ public:
 
 	// Methods //
 	virtual void Draw() override;
-	virtual Shape* Clone() override { return new Triangle(*this); }
+	virtual std::unique_ptr<Shape> Clone() override { return std::unique_ptr<Shape>(new Triangle(*this)); }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -238,7 +238,7 @@ class UnitShape final : public Shape
 {
 protected:
 	// SFML shapes //
-	std::vector<Shape*> _elem;
+	std::vector<std::unique_ptr<Shape>> _elem;
 
 	// Private methods //
 	virtual void Update() override;
@@ -248,33 +248,33 @@ protected:
 public:
 	// Constructors //
 	explicit UnitShape() { _name = "unit"; }
-	explicit UnitShape(std::shared_ptr<sf::RenderWindow> window, std::vector<Shape*> shapes) : Shape(window, { 0, 0 }) { _elem = shapes; _name = "unit"; if (_elem.size() != 0) { Update(); } }
+	explicit UnitShape(std::shared_ptr<sf::RenderWindow> window, std::vector<std::unique_ptr<Shape>> shapes) : Shape(window, { 0, 0 }) { _elem = shapes; _name = "unit"; if (_elem.size() != 0) { Update(); } }
 	explicit UnitShape(const UnitShape& temp) : Shape(temp._window, { 0, 0 }) { _elem = temp._elem; _name = "unit"; if (_elem.size() != 0) { Update(); } }
 
 	// Getters //
 	virtual size_t GetPointCount() const;
-	virtual std::vector<Shape*> GetShapes() { return _elem; }
+	virtual std::vector<std::unique_ptr<Shape>> GetShapes() { return _elem; }
 
 	// Setters //
-	virtual void SetPosition(Position& pos) { _pos._x = pos._x; _pos._y = pos._y; for (auto shape : _elem) { shape->SetPosition(pos); } }
+	virtual void SetPosition(Position& pos) { _pos._x = pos._x; _pos._y = pos._y; for (auto& shape : _elem) { shape->SetPosition(pos); } }
 	virtual void SetSize(const Position size) override {};
-	virtual void SetOutlineThickness(bool what) { _outline = what; for (auto shape : _elem) { shape->SetOutlineThickness(what); } }
+	virtual void SetOutlineThickness(bool what) { _outline = what; for (auto& shape : _elem) { shape->SetOutlineThickness(what); } }
 	virtual void SetAngle(float angle) { _angle = angle; }
-	virtual void SetScale(Position scale) { _scale = scale; for (auto shape : _elem) { shape->SetScale(scale); } }
-	virtual void SetColor(sf::Color color) { _color = color; for (auto shape : _elem) { shape->SetColor(color); } }
-	virtual void SetWindow(std::shared_ptr<sf::RenderWindow> window) { _window = window; for (auto shape : _elem) { shape->SetWindow(window); } }
-	virtual void SetVisible(bool what) { _visible = what; for (auto shape : _elem) { shape->SetVisible(what); } }
-	virtual void SetTail(bool what) { _tail = what; for (auto shape : _elem) { shape->SetTail(what); } }
-	virtual void SetShapes(std::vector<Shape*> shapes) { _elem = shapes; if (_elem.size() != 0) { Update(); } }
+	virtual void SetScale(Position scale) { _scale = scale; for (auto& shape : _elem) { shape->SetScale(scale); } }
+	virtual void SetColor(sf::Color color) { _color = color; for (auto& shape : _elem) { shape->SetColor(color); } }
+	virtual void SetWindow(std::shared_ptr<sf::RenderWindow> window) { _window = window; for (auto& shape : _elem) { shape->SetWindow(window); } }
+	virtual void SetVisible(bool what) { _visible = what; for (auto& shape : _elem) { shape->SetVisible(what); } }
+	virtual void SetTail(bool what) { _tail = what; for (auto& shape : _elem) { shape->SetTail(what); } }
+	virtual void SetShapes(std::vector<std::unique_ptr<Shape>> shapes) { _elem = shapes; if (_elem.size() != 0) { Update(); } }
 
-	virtual void SetMove(Position vector) { _move = vector; for (auto shape : _elem) { shape->SetMove(vector); } }
+	virtual void SetMove(Position vector) { _move = vector; for (auto& shape : _elem) { shape->SetMove(vector); } }
 
 	// Methods //
 	virtual void Draw() override;
-	virtual Shape* Clone() override { return new UnitShape(*this); }
+	virtual std::unique_ptr<Shape> Clone() override { return std::unique_ptr<Shape>(new UnitShape(*this)); }
 
-	virtual void Move(const float x, const float y) override { _pos._x += x, _pos._y += y; for (auto shape : _elem) { shape->Move(x, y); } };
-	virtual void Rotate(const int angle) override { _angle = (int)(_angle + angle + 360) % 360; for (auto shape : _elem) { shape->Rotate(angle); } }
+	virtual void Move(const float x, const float y) override { _pos._x += x, _pos._y += y; for (auto& shape : _elem) { shape->Move(x, y); } };
+	virtual void Rotate(const int angle) override { _angle = (int)(_angle + angle + 360) % 360; for (auto& shape : _elem) { shape->Rotate(angle); } }
 };
 
 #endif

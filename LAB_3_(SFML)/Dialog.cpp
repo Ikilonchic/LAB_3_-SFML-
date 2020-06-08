@@ -138,8 +138,8 @@ std::string Dialog::OpenFileDialog() {
 //                                        Figures dialog
 //----------------------------------------------------------------------------------------------------
 
-Shape* Dialog::OpenFiguresDialog(Factory* fac) {
-    Shape* shape = nullptr;
+std::unique_ptr<Shape> Dialog::OpenFiguresDialog(std::unique_ptr<Factory>& fac) {
+    std::unique_ptr<Shape> shape;
 
     std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(MSG_HEIGHT, MSG_WIDTH), "LAB_3", WINDOW);
     window->setFramerateLimit(60);
@@ -204,7 +204,7 @@ Shape* Dialog::OpenFiguresDialog(Factory* fac) {
                             case Token::Cancel:
                                 break;
                             default:
-                                shape = fac->MakeShape(dynamic_cast<Button*>(focus)->GetToken());
+                                shape = std::move(fac->MakeShape(dynamic_cast<Button*>(focus)->GetToken()));
                         }
 
                         window->close();

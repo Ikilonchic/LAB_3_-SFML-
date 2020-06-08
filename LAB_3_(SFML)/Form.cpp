@@ -217,16 +217,14 @@ bool Panel::OnPanel(Form& form) {
 		form.GetPosition()._x + form.GetWidth() <= this->GetPosition()._x + this->GetWidth() && form.GetPosition()._y + form.GetHeight() <= this->GetPosition()._y + this->GetHeight()) {
 		return true;
 	}
-	else return false;
+	return false;
 }
 
 bool Panel::CheckOverlay(Form& form) {
-	for (auto a : _elem) {
-		if (*a == form) {
-			return false;
-		}
+	if (std::find(_elem.begin(), _elem.end(), form) == _elem.end()) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
 void Panel::Add(Form& form) {

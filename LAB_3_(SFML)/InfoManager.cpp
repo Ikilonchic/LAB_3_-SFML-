@@ -185,7 +185,7 @@ void InfoManager::InsToStr(std::string& line, std::string ins, int index) {
 	}
 }
 
-std::string InfoManager::SaveFigure(Shape* a) {
+std::string InfoManager::SaveFigure(std::unique_ptr<Shape> a) {
 	std::string line = "|      |      |      |           |     |     |     |       |       |";
 
 	InsToStr(line, a->_name, 2);
@@ -207,9 +207,9 @@ std::string InfoManager::SaveFigure(Shape* a) {
 	return line;
 }
 
-std::vector<Shape*> InfoManager::ReadFromFile(std::string name_f) {
-	std::vector<Shape*> figures;
-	std::vector<Shape*> unit;
+std::vector<std::unique_ptr<Shape>> InfoManager::ReadFromFile(std::string name_f) {
+	std::vector<std::unique_ptr<Shape>> figures;
+	std::vector<std::unique_ptr<Shape>> unit;
 
 	std::ifstream file(name_f + ".txt");
 
@@ -222,10 +222,10 @@ std::vector<Shape*> InfoManager::ReadFromFile(std::string name_f) {
 		}
 		else if (line[0] == '+') {
 			if (unit.size() == 1 && unit[0]->OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE) {
-				figures.push_back(unit[0]);
+				figures.push_back(std::move(unit[0]));
 			}
 			else if (unit.size() > 1 && UnitShape(std::shared_ptr<sf::RenderWindow>(), unit).OnArea(SC_WIDTH * 3 / 4, SC_HEIGHT) == SIDE::NONE_SIDE) {
-				figures.push_back(new UnitShape(std::shared_ptr<sf::RenderWindow>(), unit));
+				figures.push_back(std::move(std::unique_ptr<Shape>(new UnitShape(std::shared_ptr<sf::RenderWindow>(), unit))));
 			}
 
 			unit.clear();
@@ -235,34 +235,34 @@ std::vector<Shape*> InfoManager::ReadFromFile(std::string name_f) {
 		parameters = Dispenser(line);
 
 		if (parameters[0] == "rect") {
-			unit.push_back(new Rectangle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, { ToNumber<float>(parameters[3]), ToNumber<float>(parameters[4]) }, sf::Color(ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6]), ToNumber<float>(parameters[7])), ToNumber<float>(parameters[8]), { ToNumber<float>(parameters[9]), ToNumber<float>(parameters[10]) }));
+			unit.push_back(std::move(std::unique_ptr<Shape>(new Rectangle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, { ToNumber<float>(parameters[3]), ToNumber<float>(parameters[4]) }, sf::Color(ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6]), ToNumber<float>(parameters[7])), ToNumber<float>(parameters[8]), { ToNumber<float>(parameters[9]), ToNumber<float>(parameters[10]) }))));
 		}
 		else if (parameters[0] == "circ") {
-			unit.push_back(new Circle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, ToNumber<float>(parameters[3]), sf::Color(ToNumber<float>(parameters[4]), ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6])), ToNumber<float>(parameters[7]), { ToNumber<float>(parameters[8]), ToNumber<float>(parameters[9]) }));
+			unit.push_back(std::move(std::unique_ptr<Shape>(new Circle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, ToNumber<float>(parameters[3]), sf::Color(ToNumber<float>(parameters[4]), ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6])), ToNumber<float>(parameters[7]), { ToNumber<float>(parameters[8]), ToNumber<float>(parameters[9]) }))));
 		}
 		else if (parameters[0] == "tria") {
-			unit.push_back(new Triangle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, ToNumber<float>(parameters[3]), sf::Color(ToNumber<float>(parameters[4]), ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6])), ToNumber<float>(parameters[7]), { ToNumber<float>(parameters[8]), ToNumber<float>(parameters[9]) }));
+			unit.push_back(std::move(std::unique_ptr<Shape>(new Triangle(std::shared_ptr<sf::RenderWindow>(), { ToNumber<float>(parameters[1]), ToNumber<float>(parameters[2]) }, ToNumber<float>(parameters[3]), sf::Color(ToNumber<float>(parameters[4]), ToNumber<float>(parameters[5]), ToNumber<float>(parameters[6])), ToNumber<float>(parameters[7]), { ToNumber<float>(parameters[8]), ToNumber<float>(parameters[9]) }))));
 		}
 	}
 
 	return figures;
 }
 
-void InfoManager::SaveToFile(std::string name_f, std::vector<Shape*> figures) {
+void InfoManager::SaveToFile(std::string name_f, std::vector<std::unique_ptr<Shape>> figures) {
 	std::ofstream file(name_f + ".txt");
 
 	file << "#------------------------------------------------------------------#" << std::endl;
 	file << "# name | x    | y    | size      | r   | g   | b   | angle | scale #" << std::endl;
 	file << "#------------------------------------------------------------------#" << std::endl;
 
-	for (auto a : figures) {
+	for (auto& a : figures) {
 		if (a->_name == "unit") {
-			for (auto b : dynamic_cast<UnitShape*>(a)->GetShapes()) {
-				file << SaveFigure(b) << std::endl;
+			for (auto& b : dynamic_unique_ptr_cast<UnitShape>(std::move(a))->GetShapes()) {
+				file << SaveFigure(std::move(b)) << std::endl;
 			}
 		}
 		else {
-			file << SaveFigure(a) << std::endl;
+			file << SaveFigure(std::move(a)) << std::endl;
 		}
 
 		file << "+------------------------------------------------------------------+" << std::endl;
